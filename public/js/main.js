@@ -1,3 +1,37 @@
+  document.querySelectorAll('.ckeditor').forEach((editor) => {
+        ClassicEditor
+            .create(editor, {
+                toolbar: [
+                    'heading',
+                    '|',
+                    'bold', 'italic', 'underline', 'strikethrough',
+                    '|',
+                    'bulletedList', 'numberedList',
+                    '|',
+                    'link', 'blockQuote',
+                    '|',
+                    'undo', 'redo'
+                ]
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    });
+
+    function shareProduct() {
+    if (navigator.share) {
+        navigator.share({
+            title: "{{ $product->name }}",
+            text: "Check out this product",
+            url: "{{ url()->current() }}"
+        });
+    } else {
+        navigator.clipboard.writeText("{{ url()->current() }}");
+        alert('Product link copied!');
+    }
+}
+
+
 $(document).ready(function () {
     $('.testimonial-carousel').owlCarousel({
         loop: true,
@@ -14,6 +48,8 @@ $(document).ready(function () {
         }
     });
 });
+
+
 
 $(document).ready(function () {
     // Only enable hover for large screens
