@@ -18,7 +18,8 @@ class ProductController extends Controller
     public function index()
     {
         $products = Product::with(['category', 'addons'])->latest()->get();
-        return view('admin.products.index', compact('products'));
+        return view('admin.products.index', compact('products')
+        );
     }
 
     /**
@@ -77,6 +78,7 @@ public function create()
             'short_description'    => $request->short_description,
             'technical_features'   => $request->technical_features,
             'warranty'             => $request->warranty,
+            'youtube_url'             => $request->youtube_url,
             'quantity'             => $request->quantity,
             'description'          => $request->description,
             'status'               => $request->status ?? 1,
@@ -129,6 +131,7 @@ public function create()
             'short_description'  => $request->short_description,
             'technical_features' => $request->technical_features,
             'warranty'           => $request->warranty,
+            'youtube_url'           => $request->youtube_url,
             'quantity'           => $request->quantity,
             'description'        => $request->description,
             'status'             => $request->status,
@@ -190,4 +193,6 @@ public function create()
             ->route('admin.products.index')
             ->with('success', 'Product deleted successfully');
     }
+
+    
 }

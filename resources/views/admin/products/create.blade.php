@@ -42,18 +42,18 @@
                                     </div>
                                 </div>
 
-                                  <div class="col-md-6 mb-3">
+                                <div class="col-md-6 mb-3">
                                     <label class="form-label fw-semibold">Product Name</label>
                                     <input type="text" name="name" class="form-control" placeholder="Enter product name"
                                         required>
                                 </div>
-                           
+
                             </div>
 
                             <!-- Name & Quantity -->
                             <div class="row">
-                                   <div class="col-md-6">
-                                    
+                                <div class="col-md-6">
+
                                     <!-- Product Images -->
                                     <div class="mb-4">
                                         <label class="form-label fw-semibold">Product Images</label>
@@ -85,18 +85,25 @@
                                         required>
                                 </div>
 
-<!-- Add-on Products -->
-<div class="mb-3">
-    <label class="form-label fw-semibold">Add-on Products</label>
-    <select name="addons[]" class="form-select" multiple>
-        @foreach ($products as $addon)
-            <option value="{{ $addon->id }}">{{ $addon->name }}</option>
-        @endforeach
-    </select>
-    <small class="text-muted">Select products to add as add-ons.</small>
-</div>
+                                <!-- Add-on Products -->
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Add-on Products</label>
+
+                                    <select name="addons[]" class="form-select" multiple>
+                                        @foreach ($products as $addon)
+                                        <option value="{{ $addon->id }}">
+                                            {{ $addon->name }} (₹{{ $addon->price }})
+                                        </option>
+                                        @endforeach
+                                    </select>
+
+                                    <small class="text-muted">
+                                        Hold <b>Ctrl</b> to select multiple add-ons.
+                                    </small>
+                                </div>
+
                             </div>
-                                
+
                             <!-- Descriptions -->
                             <div class="mb-3">
                                 <label class="form-label fw-semibold">Short Description</label>
@@ -110,13 +117,20 @@
 
                             <div class="mb-3">
                                 <label class="form-label fw-semibold">Technical Features</label>
-                                <textarea name="technical_features" class="form-control ckeditor"
-                                    rows="4"></textarea>
+                                <textarea name="technical_features" class="form-control ckeditor" rows="4"></textarea>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label fw-semibold">Product Warranty</label>
                                 <textarea name="warranty" class="form-control ckeditor" rows="3"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">YouTube Video URL</label>
+                                <input type="url" name="youtube_url" class="form-control"
+                                    placeholder="https://www.youtube.com/embed/VIDEO_ID">
+                                <small class="text-muted">
+                                    Use embed URL (recommended)
+                                </small>
                             </div>
 
                             <!-- Status -->
