@@ -31,6 +31,46 @@
     }
 }
 
+let addons = [];
+
+function addAddon() {
+    let select = document.getElementById('addonSelect');
+    let id = select.value;
+    let text = select.options[select.selectedIndex].text;
+
+    if (!id || addons.includes(id)) return;
+
+    addons.push(id);
+    document.getElementById('addonsInput').value = addons;
+
+    let li = document.createElement('li');
+    li.className = 'list-group-item d-flex justify-content-between';
+    li.innerHTML = `${text}
+        <button type="button" class="btn btn-danger btn-sm" onclick="removeAddon(${id}, this)">Remove</button>`;
+    document.getElementById('addonList').appendChild(li);
+}
+
+function removeAddon(id, el) {
+    addons = addons.filter(a => a != id);
+    document.getElementById('addonsInput').value = addons;
+    el.parentElement.remove();
+}
+
+function addToCart(slug) {
+    fetch(`/cart/add/${slug}`, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Accept': 'application/json'
+        }
+    })
+    .then(res => res.json())
+    .then(() => {
+        openCart();
+        loadCart();
+    });
+}
+
 
 $(document).ready(function () {
     $('.testimonial-carousel').owlCarousel({

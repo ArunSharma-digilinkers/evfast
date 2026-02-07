@@ -15,6 +15,7 @@ class Product extends Model
         'short_description',
         'technical_features',
         'warranty',
+        'youtube_url',
         'quantity',
         'description',
         'status',

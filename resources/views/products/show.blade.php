@@ -1,8 +1,8 @@
 @extends('layouts.main')
 
 @section('content')
-<div class="main-wrapper">
-    <div class="container section-entry">
+<div class="main-wrapper section-entry">
+    <div class="container">
 
         <div class="row g-5">
 
@@ -20,14 +20,14 @@
 
                     @foreach($gallery as $img)
                     <img src="{{ asset('storage/products/gallery/'.$img) }}" class="img-thumbnail thumb"
-                        onclick="changeImage(this)">
+                        onclick="changeImage(this)" >
                     @endforeach
                 </div>
 
                 {{-- Main Image --}}
-                <div class="border rounded p-3 flex-fill text-center">
+                <div class="border rounded p-3 flex-fill text-center product-main-image">
                     <img id="mainImage" src="{{ asset('storage/products/'.$product->image) }}"
-                        class="img-fluid main-img" alt="{{ $product->name }}">
+                        class="img-fluid main-img" alt="{{ $product->name }}" >
                 </div>
             </div>
 
@@ -43,17 +43,17 @@
 
                 {{-- PRICE --}}
                 <h3 class="fw-bold text-success mb-1">
-                    ₹{{ number_format($product->sale_price ?? $product->price) }}
+                    ₹{{ number_format($product->price ?? $product->price) }}
 
                     @if($product->sale_price)
                     <span class="text-muted fs-6 text-decoration-line-through ms-2">
-                        ₹{{ number_format($product->price) }}
+                        ₹{{ number_format($product->sale_price) }}
                     </span>
                     @endif
                 </h3>
 
                 <p class="text-muted small mb-3">
-                    Inclusive of all taxes<br>Free Shipping
+                    Including gst. (5%)<br>Shipping free 
                 </p>
 
                 {{-- FEATURES (CKEDITOR CONTENT) --}}
@@ -94,7 +94,7 @@
                         </h2>
                         <div id="desc" class="accordion-collapse collapse show" data-bs-parent="#productAccordion">
                             <div class="accordion-body">
-                                {!! nl2br(e($product->description)) !!}
+                               {!! $product->description !!}
                             </div>
                         </div>
                     </div>
@@ -109,7 +109,7 @@
                         </h2>
                         <div id="features" class="accordion-collapse collapse" data-bs-parent="#productAccordion">
                             <div class="accordion-body">
-                                {!! $product->technical_features ?? 'N/A' !!}
+                                {!! $product->technical_features !!}
                             </div>
                         </div>
                     </div>
@@ -124,7 +124,7 @@
                         </h2>
                         <div id="warranty" class="accordion-collapse collapse" data-bs-parent="#productAccordion">
                             <div class="accordion-body">
-                                {!! $product->warranty ?? 'N/A' !!}
+                                {!! $product->warranty !!}
                             </div>
                         </div>
                     </div>
