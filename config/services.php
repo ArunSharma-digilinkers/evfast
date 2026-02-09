@@ -35,8 +35,12 @@ return [
         ],
     ],
     'razorpay' => [
-    'key' => env('RAZORPAY_KEY'),
-    'secret' => env('RAZORPAY_SECRET'),
-],
+        'key' => env('RAZORPAY_KEY'),
+        'secret' => env('RAZORPAY_SECRET'),
+    ],
+
+    'evfast' => [
+        'admin_email' => env('ADMIN_EMAIL', 'admin@evfast.com'),
+    ],
 
 ];

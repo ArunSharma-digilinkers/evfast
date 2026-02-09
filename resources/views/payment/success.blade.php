@@ -73,9 +73,17 @@
             <a href="{{ url('/') }}" class="btn btn-outline-primary">
                 Continue Shopping
             </a>
-            <a href="{{ route('admin.orders.show', $order->id) }}" class="btn btn-primary">
-                View Order
-            </a>
+            @auth
+                @if(auth()->user()->role === 'admin')
+                    <a href="{{ route('admin.orders.show', $order->id) }}" class="btn btn-primary">
+                        View Order
+                    </a>
+                @else
+                    <a href="{{ route('user.orders.show', $order->id) }}" class="btn btn-primary">
+                        View Order
+                    </a>
+                @endif
+            @endauth
         </div>
 
     </div>
