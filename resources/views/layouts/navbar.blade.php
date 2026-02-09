@@ -28,7 +28,7 @@
                         </ul>
                     </li>
 
-                    <li class="nav-item"><a class="nav-link" href="#">Blog</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url('blog') }}">Blog</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url('contact-us') }}">Contact Us</a></li>
                 </ul>
             </div>

@@ -9,7 +9,7 @@ use App\Http\Controllers\FrontProductController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\Admin\AddonController;
-use App\Http\Controllers\RazorpayController;
+use App\Http\Controllers\BlogController;
 use App\Models\Order;
 
 Route::get('/', [PagesController::class, 'index']);
@@ -21,6 +21,9 @@ Route::get('ac-chargers', [PagesController::class, 'acchargers']);
 Route::get('dc-chargers', [PagesController::class, 'dcchargers']);
 Route::get('gun-holders', [PagesController::class, 'gunholders']);
 Route::get('accessories', [PagesController::class, 'accessories']);
+
+Route::get('/blog', [PagesController::class, 'blog'])->name('blog');
+Route::get('/details/{slug}', [PagesController::class, 'show'])->name('details.show');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -35,6 +38,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('orders/{order}', [App\Http\Controllers\Admin\OrderController::class, 'show'])->name('orders.show');
     Route::post('orders/{order}/status', [App\Http\Controllers\Admin\OrderController::class, 'updateStatus'])->name('orders.updateStatus');
     Route::resource('addons', AddonController::class)->except('show');
+    Route::resource('blog', BlogController::class);
 });
 
 // Single product page
