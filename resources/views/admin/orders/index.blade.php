@@ -18,7 +18,8 @@
                             <th>Phone</th>
                             <th>Total Amount</th>
                             <th>Status</th>
-                            <th>Actions</th>
+                            <th>Date & Time</th>
+                           
                         </tr>
                     </thead>
                     <tbody>
@@ -29,6 +30,8 @@
                             <td>{{ $order->email }}</td>
                             <td>{{ $order->phone }}</td>
                             <td>₹{{ number_format($order->total_amount) }}</td>
+                            <td>{{ $order->payment_status }}</td>
+                            <td>{{ $order->created_at }}</td>
                             <td>
                                 <span class="badge 
                                     {{ $order->status == 'pending' ? 'bg-warning' : '' }}
@@ -38,7 +41,8 @@
                                 </span>
                             </td>
                             <td>
-                                <a href="{{ route('admin.orders.show', $order->id) }}" class="btn btn-sm btn-primary">View</a>
+                                <a href="{{ route('admin.orders.show', $order->id) }}"
+                                    class="btn btn-sm btn-primary">View</a>
                             </td>
                         </tr>
                         @empty

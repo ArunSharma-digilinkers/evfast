@@ -20,7 +20,7 @@
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="servicesDropdown">
                             <li><a class="dropdown-item" href="{{ url('portable-ev-chargers') }}">Portable EV Chargers</a></li>
-                            <li><a class="dropdown-item" href="{{ url('wall-mount-ev-chargers') }}">Wall Mount Chargers</a></li>
+                            <li><a class="dropdown-item" href="{{ url('popular-ac-charger') }}">	Popular AC Charger</a></li>
                             <li><a class="dropdown-item" href="{{ url('ac-chargers') }}">AC Chargers</a></li>
                             <li><a class="dropdown-item" href="{{ url('dc-chargers') }}">DC Chargers</a></li>
                             <li><a class="dropdown-item" href="{{ url('gun-holders') }}">Gun Holder</a></li>

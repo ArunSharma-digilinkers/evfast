@@ -55,10 +55,10 @@ class PagesController extends Controller
             'category'
         ));
     }
-    public function wallmount()
+    public function popularac()
     {
           // Get category
-        $category = Category::where('name', 'Wall Mount Ev Charger')->firstOrFail();
+        $category = Category::where('name', 'Popular AC Charger')->firstOrFail();
 
         // Get products in ASC order
         $products = Product::where('status', 1)
@@ -69,7 +69,7 @@ class PagesController extends Controller
         // All categories (for menu/sidebar)
         $categories = Category::all();
 
-        return view('products.wall-mount-ev-chargers', compact(
+        return view('products.popular-ac-charger', compact(
             'products',
             'categories',
             'category'
@@ -79,7 +79,7 @@ class PagesController extends Controller
     public function acchargers()
     {
    // Get category
-        $category = Category::where('name', 'AC Charger')->firstOrFail();
+        $category = Category::where('name', 'AC Chargers')->firstOrFail();
 
         // Get products in ASC order
         $products = Product::where('status', 1)
@@ -121,7 +121,7 @@ class PagesController extends Controller
     public function gunholders()
     {
          // Get category
-        $category = Category::where('name', 'Gun Holder')->firstOrFail();
+        $category = Category::where('name', 'Gun Holders')->firstOrFail();
 
         // Get products in ASC order
         $products = Product::where('status', 1)

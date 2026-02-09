@@ -8,13 +8,15 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\FrontProductController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\CheckoutController;
-
+use App\Http\Controllers\Admin\AddonController;
+use App\Http\Controllers\RazorpayController;
+use App\Models\Order;
 
 Route::get('/', [PagesController::class, 'index']);
 Route::get('about-us', [PagesController::class, 'about']);
 Route::get('contact-us', [PagesController::class, 'contact']);
 Route::get('portable-ev-chargers', [PagesController::class, 'portableevchargers']);
-Route::get('wall-mount-ev-chargers', [PagesController::class, 'wallmount']);
+Route::get('popular-ac-charger', [PagesController::class, 'popularac']);
 Route::get('ac-chargers', [PagesController::class, 'acchargers']);
 Route::get('dc-chargers', [PagesController::class, 'dcchargers']);
 Route::get('gun-holders', [PagesController::class, 'gunholders']);
@@ -29,9 +31,10 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::resource('categories', CategoryController::class);
     Route::resource('products', ProductController::class);
-     Route::get('orders', [App\Http\Controllers\Admin\OrderController::class, 'index'])->name('orders.index');
+    Route::get('orders', [App\Http\Controllers\Admin\OrderController::class, 'index'])->name('orders.index');
     Route::get('orders/{order}', [App\Http\Controllers\Admin\OrderController::class, 'show'])->name('orders.show');
     Route::post('orders/{order}/status', [App\Http\Controllers\Admin\OrderController::class, 'updateStatus'])->name('orders.updateStatus');
+    Route::resource('addons', AddonController::class)->except('show');
 });
 
 // Single product page
@@ -66,18 +69,19 @@ Route::get('/cart/remove/{slug}', [CartController::class, 'remove'])->name('cart
 
 
 
+// Checkout (Guest allowed)
+Route::get('/checkout', [CheckoutController::class, 'index'])
+    ->name('checkout');
 
-Route::middleware('auth')->group(function () {
+Route::post('/checkout/place', [CheckoutController::class, 'placeOrder'])
+    ->name('checkout.place');
 
-    // Show checkout page
-    Route::get('/checkout', [CheckoutController::class, 'index'])
-        ->name('checkout');
+Route::get('/payment-success/{order}', function (Order $order) {
+    return view('payment.success', compact('order'));
+})->name('payment.success');
 
-    // Place order
-    Route::post('/checkout', [CheckoutController::class, 'placeOrder'])
-        ->name('checkout.place');
 
-});
+
 
 
 
