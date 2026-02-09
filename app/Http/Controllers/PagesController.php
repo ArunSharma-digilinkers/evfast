@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Blog;
 
 class PagesController extends Controller
 {
@@ -158,5 +159,15 @@ class PagesController extends Controller
             'categories',
             'category'
         ));
+    }
+
+          public function blog(){
+         $blogs = Blog::orderBy('id', 'DESC')->get();
+        return view('pages.blog', compact('blogs'));
+    }
+
+       public function show($slug){
+        $blogs = Blog::where('slug', $slug)->firstOrFail();
+        return view('pages.details', compact('blogs'));
     }
 }
