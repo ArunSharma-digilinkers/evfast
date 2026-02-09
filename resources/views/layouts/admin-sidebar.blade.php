@@ -24,6 +24,7 @@
                 </a>
             </li>
 
+          
             <li class="nav-item">
                 <a href="{{ route('admin.orders.index') }}" class="nav-link">
                     <i class="fas fa-shopping-cart me-2"></i> Orders

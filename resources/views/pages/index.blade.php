@@ -116,6 +116,7 @@
             </div>
         </div>
     </div>
+
     <div class="new-arrival-wrapper section-entry" data-aos="fade-up">
         <div class="container">
             <div class="row">
