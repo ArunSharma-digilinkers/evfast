@@ -80,7 +80,7 @@
                     <a href="{{ url('wall-mount-ev-chargers') }}">
                         <div class="product-card">
                             <img src="{{ asset('img/product/wall-mount-ev-charger.jpg') }}" alt="">
-                            <h4>Wall Mount EV Charger</h4>
+                            <h4>Popular AC Charger</h4>
                         </div>
                     </a>
 

@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\ShippingZoneController;
 use App\Http\Controllers\RazorpayController;
 use App\Http\Controllers\UserDashboardController;
 use App\Http\Controllers\AddressController;
+use App\Http\Controllers\BlogController;
 use App\Models\Order;
 
 Route::get('/', [PagesController::class, 'index']);
@@ -25,6 +26,9 @@ Route::get('ac-chargers', [PagesController::class, 'acchargers']);
 Route::get('dc-chargers', [PagesController::class, 'dcchargers']);
 Route::get('gun-holders', [PagesController::class, 'gunholders']);
 Route::get('accessories', [PagesController::class, 'accessories']);
+
+Route::get('/blog', [PagesController::class, 'blog'])->name('blog');
+Route::get('/details/{slug}', [PagesController::class, 'show'])->name('details.show');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -41,6 +45,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('addons', AddonController::class)->except('show');
     Route::resource('coupons', CouponController::class)->except('show');
     Route::resource('shipping-zones', ShippingZoneController::class)->except('show');
+    Route::resource('blog', BlogController::class);
 });
 
 // Category products page

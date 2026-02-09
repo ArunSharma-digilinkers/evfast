@@ -102,4 +102,13 @@ $(document).ready(function() {
 	  });
   });
 
+  document.querySelector('[name="post_title"]').addEventListener('keyup', function () {
+    let slug = this.value
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '');
+
+    document.querySelector('[name="slug"]').value = slug;
+});
+
 
