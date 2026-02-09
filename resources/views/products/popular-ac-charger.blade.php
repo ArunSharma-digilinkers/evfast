@@ -8,7 +8,7 @@
             <div class="row">
                 <div class="col-lg-12 text-center">
                     <span class="sub-title">Future-Ready Charging Solutions</span>
-                    <h2>Wall Mount EV Charger </h2>
+                    <h2>Popular AC Charger</h2>
                 </div>
                 <div class="inner-product-grid">
                     @forelse($products as $product)

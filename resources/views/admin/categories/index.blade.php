@@ -54,8 +54,13 @@
                             </td>
 
                             <td>
+                                <a href="{{ route('category.products', $category->slug) }}"
+                                   class="btn btn-sm btn-info me-1" target="_blank" title="View">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+
                                 <a href="{{ route('admin.categories.edit', $category->id) }}"
-                                   class="btn btn-sm btn-warning me-1">
+                                   class="btn btn-sm btn-warning me-1" title="Edit">
                                     <i class="fas fa-edit"></i>
                                 </a>
 
@@ -64,7 +69,7 @@
                                     @csrf
                                     @method('DELETE')
                                     <button onclick="return confirm('Are you sure you want to delete this category?')"
-                                            class="btn btn-sm btn-danger">
+                                            class="btn btn-sm btn-danger" title="Delete">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </form>

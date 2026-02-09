@@ -4,7 +4,7 @@
 <div class="main-wrapper">
 
      <div class="banner-wrapper">
-        <img src="{{ asset('img/about-banner.jpg') }}" alt="" class="img-fluid">
+        <img src="{{ asset('img/contact-us.jpg') }}" alt="" class="img-fluid">
     </div>
 
     <div class="contact-wrapper section-entry">

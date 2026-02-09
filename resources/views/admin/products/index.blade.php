@@ -28,7 +28,8 @@
                             <th width="60">#</th>
                             <th>Product</th>
                             <th>Category</th>
-                            <th>Price</th>
+                            <th>MRP</th>
+                            <th>Sales Price</th>
                             <th>Qty</th>
                             <th>Status</th>
                             <th>Image</th>
@@ -37,78 +38,79 @@
                     </thead>
 
                     <tbody>
-@forelse($products as $product)
-<tr>
-    <td>{{ $loop->iteration }}</td>
+                        @forelse($products as $product)
+                        <tr>
+                            <td>{{ $loop->iteration }}</td>
 
-    <td class="fw-semibold">
-        {{ $product->name }}
-    </td>
+                            <td class="fw-semibold">
+                                {{ $product->name }}
+                            </td>
 
-    <td>
-        <span class="badge bg-light text-dark">
-            {{ $product->category->name }}
-        </span>
-    </td>
+                            <td>
+                                <span class="badge bg-light text-dark">
+                                    {{ $product->category->name }}
+                                </span>
+                            </td>
 
-    <td class="fw-semibold">
-        ₹{{ number_format($product->price) }}
-    </td>
+                            <td class="fw-semibold">
+                                ₹{{ number_format($product->price) }}
+                            </td>
+                             <td class="fw-semibold">
+                                ₹{{ number_format($product->sale_price) }}
+                            </td>
 
-    <td>
-        {{ $product->quantity }}
-    </td>
+                            <td>
+                                {{ $product->quantity }}
+                            </td>
 
-    {{-- ✅ STATUS --}}
-    <td>
-        @if($product->status)
-            <span class="badge bg-success">
-                <i class="fas fa-check-circle me-1"></i> Active
-            </span>
-        @else
-            <span class="badge bg-secondary">
-                <i class="fas fa-times-circle me-1"></i> Inactive
-            </span>
-        @endif
-    </td>
+                            {{-- ✅ STATUS --}}
+                            <td>
+                                @if($product->status)
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check-circle me-1"></i> Active
+                                </span>
+                                @else
+                                <span class="badge bg-secondary">
+                                    <i class="fas fa-times-circle me-1"></i> Inactive
+                                </span>
+                                @endif
+                            </td>
 
-    {{-- ✅ IMAGE --}}
-    <td>
-        @if($product->image)
-            <img src="{{ asset('storage/products/'.$product->image) }}"
-                 width="60"
-                 class="img-thumbnail">
-        @else
-            <span class="text-muted">No Image</span>
-        @endif
-    </td>
+                            {{-- ✅ IMAGE --}}
+                            <td>
+                                @if($product->image)
+                                <img src="{{ asset('storage/products/'.$product->image) }}" width="60"
+                                    class="img-thumbnail">
+                                @else
+                                <span class="text-muted">No Image</span>
+                                @endif
+                            </td>
 
-    {{-- ✅ ACTION --}}
-    <td>
-        <a href="{{ route('admin.products.edit', $product->id) }}"
-           class="btn btn-sm btn-warning me-1">
-            <i class="fas fa-edit"></i>
-        </a>
+                            {{-- ✅ ACTION --}}
+                            <td>
+                                <a href="{{ route('admin.products.edit', $product->id) }}"
+                                    class="btn btn-sm btn-warning me-1">
+                                    <i class="fas fa-edit"></i>
+                                </a>
 
-        <form action="{{ route('admin.products.destroy', $product->id) }}"
-              method="POST" class="d-inline">
-            @csrf
-            @method('DELETE')
-            <button onclick="return confirm('Are you sure?')"
-                    class="btn btn-sm btn-danger">
-                <i class="fas fa-trash"></i>
-            </button>
-        </form>
-    </td>
-</tr>
-@empty
-<tr>
-    <td colspan="8" class="text-center text-muted py-4">
-        No products found
-    </td>
-</tr>
-@endforelse
-</tbody>
+                                <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST"
+                                    class="d-inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button onclick="return confirm('Are you sure?')" class="btn btn-sm btn-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="8" class="text-center text-muted py-4">
+                                No products found
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
 
                 </table>
             </div>
