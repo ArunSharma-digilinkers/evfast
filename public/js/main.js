@@ -1,3 +1,51 @@
+  document.querySelectorAll('.ckeditor').forEach((editor) => {
+        ClassicEditor
+            .create(editor, {
+                toolbar: [
+                    'heading',
+                    '|',
+                    'bold', 'italic', 'underline', 'strikethrough',
+                    '|',
+                    'bulletedList', 'numberedList',
+                    '|',
+                    'link', 'blockQuote',
+                    '|',
+                    'undo', 'redo'
+                ]
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    });
+
+
+let addons = [];
+
+function addAddon() {
+    let select = document.getElementById('addonSelect');
+    let id = select.value;
+    let text = select.options[select.selectedIndex].text;
+
+    if (!id || addons.includes(id)) return;
+
+    addons.push(id);
+    document.getElementById('addonsInput').value = addons;
+
+    let li = document.createElement('li');
+    li.className = 'list-group-item d-flex justify-content-between';
+    li.innerHTML = `${text}
+        <button type="button" class="btn btn-danger btn-sm" onclick="removeAddon(${id}, this)">Remove</button>`;
+    document.getElementById('addonList').appendChild(li);
+}
+
+function removeAddon(id, el) {
+    addons = addons.filter(a => a != id);
+    document.getElementById('addonsInput').value = addons;
+    el.parentElement.remove();
+}
+
+
+
 $(document).ready(function () {
     $('.testimonial-carousel').owlCarousel({
         loop: true,
@@ -14,6 +62,8 @@ $(document).ready(function () {
         }
     });
 });
+
+
 
 $(document).ready(function () {
     // Only enable hover for large screens
@@ -51,5 +101,14 @@ $(document).ready(function() {
 		duration: 1000,
 	  });
   });
+
+  document.querySelector('[name="post_title"]').addEventListener('keyup', function () {
+    let slug = this.value
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '');
+
+    document.querySelector('[name="slug"]').value = slug;
+});
 
 

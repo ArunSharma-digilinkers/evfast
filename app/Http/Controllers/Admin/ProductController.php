@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Addon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
@@ -16,18 +17,22 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::with('category')->latest()->get();
-        return view('admin.products.index', compact('products'));
+        $products = Product::with(['category', 'addons'])->latest()->get();
+        return view('admin.products.index', compact('products')
+        );
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
-        $categories = Category::where('status', 1)->get();
-        return view('admin.products.create', compact('categories'));
-    }
+public function create()
+{
+    $categories = Category::all();
+    $products = Product::all(); // all products to select add-ons from
+
+    return view('admin.products.create', compact('categories', 'products'));
+}
+
 
     /**
      * Store a newly created resource in storage.
@@ -35,22 +40,25 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'category_id' => 'required',
+            'category_id' => 'required|exists:categories,id',
             'name'        => 'required|unique:products,name',
             'price'       => 'required|numeric',
+            'sale_price'  => 'nullable|numeric',
             'quantity'    => 'required|integer',
             'image'       => 'required|image|mimes:jpg,jpeg,png,webp',
             'images.*'    => 'nullable|image|mimes:jpg,jpeg,png,webp',
+            'addons'      => 'nullable|array',
+            'addons.*'    => 'exists:products,id',
         ]);
 
-        /* ---------- Main Image ---------- */
+        /* ---------- MAIN IMAGE ---------- */
         $mainImage = null;
         if ($request->hasFile('image')) {
             $mainImage = time() . '.' . $request->image->extension();
             $request->image->storeAs('products', $mainImage, 'public');
         }
 
-        /* ---------- Multiple Images ---------- */
+        /* ---------- GALLERY IMAGES ---------- */
         $gallery = [];
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $img) {
@@ -60,17 +68,29 @@ class ProductController extends Controller
             }
         }
 
-        Product::create([
-            'category_id' => $request->category_id,
-            'name'        => $request->name,
-            'slug'        => Str::slug($request->name),
-            'price'       => $request->price,
-            'quantity'    => $request->quantity,
-            'description' => $request->description,
-            'status'      => $request->status ?? 1,
-            'image'       => $mainImage,
-            'images'      => $gallery,
+        /* ---------- CREATE PRODUCT ---------- */
+        $product = Product::create([
+            'category_id'          => $request->category_id,
+            'name'                 => $request->name,
+            'slug'                 => Str::slug($request->name),
+            'price'                => $request->price,
+            'sale_price'           => $request->sale_price,
+            'gst_percentage'       => $request->gst_percentage ?? 0,
+            'gst_type'             => $request->gst_type ?? 'inclusive',
+            'shipping_type'        => $request->shipping_type ?? 'free',
+            'short_description'    => $request->short_description,
+            'technical_features'   => $request->technical_features,
+            'warranty'             => $request->warranty,
+            'youtube_url'             => $request->youtube_url,
+            'quantity'             => $request->quantity,
+            'description'          => $request->description,
+            'status'               => $request->status ?? 1,
+            'image'                => $mainImage,
+            'images'               => $gallery,
         ]);
+
+        /* ---------- ATTACH ADD-ONS ---------- */
+        $product->addons()->sync($request->addons ?? []);
 
         return redirect()
             ->route('admin.products.index')
@@ -78,20 +98,14 @@ class ProductController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(Product $product)
-    {
-        return view('admin.products.show', compact('product'));
-    }
-
-    /**
      * Show the form for editing the specified resource.
      */
     public function edit(Product $product)
     {
-        $categories = Category::where('status', 1)->get();
-        return view('admin.products.edit', compact('product', 'categories'));
+        $categories = Category::all();
+        $products   = Product::where('id', '!=', $product->id)->get();
+
+        return view('admin.products.edit', compact('product', 'categories', 'products'));
     }
 
     /**
@@ -100,25 +114,36 @@ class ProductController extends Controller
     public function update(Request $request, Product $product)
     {
         $request->validate([
-            'category_id' => 'required',
+            'category_id' => 'required|exists:categories,id',
             'name'        => 'required|unique:products,name,' . $product->id,
             'price'       => 'required|numeric',
+            'sale_price'  => 'nullable|numeric',
             'quantity'    => 'required|integer',
             'image'       => 'nullable|image|mimes:jpg,jpeg,png,webp',
             'images.*'    => 'nullable|image|mimes:jpg,jpeg,png,webp',
+            'addons'      => 'nullable|array',
+            'addons.*'    => 'exists:products,id',
         ]);
 
         $data = [
-            'category_id' => $request->category_id,
-            'name'        => $request->name,
-            'slug'        => Str::slug($request->name),
-            'price'       => $request->price,
-            'quantity'    => $request->quantity,
-            'description' => $request->description,
-            'status'      => $request->status,
+            'category_id'        => $request->category_id,
+            'name'               => $request->name,
+            'slug'               => Str::slug($request->name),
+            'price'              => $request->price,
+            'sale_price'         => $request->sale_price,
+            'gst_percentage'     => $request->gst_percentage ?? 0,
+            'gst_type'           => $request->gst_type ?? 'inclusive',
+            'shipping_type'      => $request->shipping_type ?? 'free',
+            'short_description'  => $request->short_description,
+            'technical_features' => $request->technical_features,
+            'warranty'           => $request->warranty,
+            'youtube_url'           => $request->youtube_url,
+            'quantity'           => $request->quantity,
+            'description'        => $request->description,
+            'status'             => $request->status,
         ];
 
-        /* ---------- Replace Main Image ---------- */
+        /* ---------- REPLACE MAIN IMAGE ---------- */
         if ($request->hasFile('image')) {
             if ($product->image) {
                 Storage::disk('public')->delete('products/' . $product->image);
@@ -129,7 +154,7 @@ class ProductController extends Controller
             $data['image'] = $mainImage;
         }
 
-        /* ---------- Add More Gallery Images ---------- */
+        /* ---------- ADD MORE GALLERY IMAGES ---------- */
         if ($request->hasFile('images')) {
             $gallery = $product->images ?? [];
 
@@ -143,6 +168,9 @@ class ProductController extends Controller
         }
 
         $product->update($data);
+
+        /* ---------- SYNC ADD-ONS ---------- */
+        $product->addons()->sync($request->addons ?? []);
 
         return redirect()
             ->route('admin.products.index')
@@ -164,10 +192,13 @@ class ProductController extends Controller
             }
         }
 
+        $product->addons()->detach();
         $product->delete();
 
         return redirect()
             ->route('admin.products.index')
             ->with('success', 'Product deleted successfully');
     }
+
+    
 }

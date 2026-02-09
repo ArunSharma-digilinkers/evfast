@@ -8,17 +8,27 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\FrontProductController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\CheckoutController;
-
+use App\Http\Controllers\Admin\AddonController;
+use App\Http\Controllers\Admin\CouponController;
+use App\Http\Controllers\Admin\ShippingZoneController;
+use App\Http\Controllers\RazorpayController;
+use App\Http\Controllers\UserDashboardController;
+use App\Http\Controllers\AddressController;
+use App\Http\Controllers\BlogController;
+use App\Models\Order;
 
 Route::get('/', [PagesController::class, 'index']);
 Route::get('about-us', [PagesController::class, 'about']);
 Route::get('contact-us', [PagesController::class, 'contact']);
 Route::get('portable-ev-chargers', [PagesController::class, 'portableevchargers']);
-Route::get('wall-mount-ev-chargers', [PagesController::class, 'wallmount']);
+Route::get('popular-ac-charger', [PagesController::class, 'popularac']);
 Route::get('ac-chargers', [PagesController::class, 'acchargers']);
 Route::get('dc-chargers', [PagesController::class, 'dcchargers']);
 Route::get('gun-holders', [PagesController::class, 'gunholders']);
 Route::get('accessories', [PagesController::class, 'accessories']);
+
+Route::get('/blog', [PagesController::class, 'blog'])->name('blog');
+Route::get('/details/{slug}', [PagesController::class, 'show'])->name('details.show');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -29,10 +39,17 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::resource('categories', CategoryController::class);
     Route::resource('products', ProductController::class);
-     Route::get('orders', [App\Http\Controllers\Admin\OrderController::class, 'index'])->name('orders.index');
+    Route::get('orders', [App\Http\Controllers\Admin\OrderController::class, 'index'])->name('orders.index');
     Route::get('orders/{order}', [App\Http\Controllers\Admin\OrderController::class, 'show'])->name('orders.show');
     Route::post('orders/{order}/status', [App\Http\Controllers\Admin\OrderController::class, 'updateStatus'])->name('orders.updateStatus');
+    Route::resource('addons', AddonController::class)->except('show');
+    Route::resource('coupons', CouponController::class)->except('show');
+    Route::resource('shipping-zones', ShippingZoneController::class)->except('show');
+    Route::resource('blog', BlogController::class);
 });
+
+// Category products page
+Route::get('/category/{slug}', [FrontProductController::class, 'category'])->name('category.products');
 
 // Single product page
 Route::get('/product/{id}', [FrontProductController::class, 'show'])->name('product.show');
@@ -51,11 +68,12 @@ Route::prefix('admin')
 /* USER ROUTES */
 Route::prefix('user')
     ->middleware(['auth', 'role:user'])
+    ->name('user.')
     ->group(function () {
 
-        Route::get('/dashboard', function () {
-            return view('user.dashboard');
-        })->name('user.dashboard');
+        Route::get('/dashboard', [UserDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/orders/{order}', [UserDashboardController::class, 'showOrder'])->name('orders.show');
+        Route::resource('addresses', AddressController::class)->except(['show']);
 
     });
 
@@ -66,18 +84,32 @@ Route::get('/cart/remove/{slug}', [CartController::class, 'remove'])->name('cart
 
 
 
+// Checkout (Guest allowed)
+Route::get('/checkout', [CheckoutController::class, 'index'])
+    ->name('checkout');
 
-Route::middleware('auth')->group(function () {
+Route::post('/checkout/place', [CheckoutController::class, 'placeOrder'])
+    ->name('checkout.place');
 
-    // Show checkout page
-    Route::get('/checkout', [CheckoutController::class, 'index'])
-        ->name('checkout');
+Route::post('/checkout/apply-coupon', [CheckoutController::class, 'applyCoupon'])
+    ->name('checkout.applyCoupon');
 
-    // Place order
-    Route::post('/checkout', [CheckoutController::class, 'placeOrder'])
-        ->name('checkout.place');
+Route::get('/checkout/remove-coupon', [CheckoutController::class, 'removeCoupon'])
+    ->name('checkout.removeCoupon');
 
-});
+Route::get('/checkout/shipping-cost', [CheckoutController::class, 'getShippingCost'])
+    ->name('checkout.shippingCost');
+
+Route::get('/checkout/address/{address}', [CheckoutController::class, 'getAddress'])
+    ->middleware('auth')
+    ->name('checkout.getAddress');
+
+Route::get('/payment-success/{order}', function (Order $order) {
+    return view('payment.success', compact('order'));
+})->name('payment.success');
+
+
+
 
 
 

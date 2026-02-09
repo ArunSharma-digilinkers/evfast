@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Blog;
 
 class PagesController extends Controller
 {
@@ -55,10 +56,10 @@ class PagesController extends Controller
             'category'
         ));
     }
-    public function wallmount()
+    public function popularac()
     {
           // Get category
-        $category = Category::where('name', 'Wall Mount Ev Charger')->firstOrFail();
+        $category = Category::where('name', 'Popular AC Charger')->firstOrFail();
 
         // Get products in ASC order
         $products = Product::where('status', 1)
@@ -69,7 +70,7 @@ class PagesController extends Controller
         // All categories (for menu/sidebar)
         $categories = Category::all();
 
-        return view('products.wall-mount-ev-chargers', compact(
+        return view('products.popular-ac-charger', compact(
             'products',
             'categories',
             'category'
@@ -79,7 +80,7 @@ class PagesController extends Controller
     public function acchargers()
     {
    // Get category
-        $category = Category::where('name', 'AC Charger')->firstOrFail();
+        $category = Category::where('name', 'AC Chargers')->firstOrFail();
 
         // Get products in ASC order
         $products = Product::where('status', 1)
@@ -121,7 +122,7 @@ class PagesController extends Controller
     public function gunholders()
     {
          // Get category
-        $category = Category::where('name', 'Gun Holder')->firstOrFail();
+        $category = Category::where('name', 'Gun Holders')->firstOrFail();
 
         // Get products in ASC order
         $products = Product::where('status', 1)
@@ -158,5 +159,15 @@ class PagesController extends Controller
             'categories',
             'category'
         ));
+    }
+
+          public function blog(){
+         $blogs = Blog::orderBy('id', 'DESC')->get();
+        return view('pages.blog', compact('blogs'));
+    }
+
+       public function show($slug){
+        $blogs = Blog::where('slug', $slug)->firstOrFail();
+        return view('pages.details', compact('blogs'));
     }
 }
