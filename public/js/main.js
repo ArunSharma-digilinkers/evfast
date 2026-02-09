@@ -18,18 +18,6 @@
             });
     });
 
-    function shareProduct() {
-    if (navigator.share) {
-        navigator.share({
-            title: "{{ $product->name }}",
-            text: "Check out this product",
-            url: "{{ url()->current() }}"
-        });
-    } else {
-        navigator.clipboard.writeText("{{ url()->current() }}");
-        alert('Product link copied!');
-    }
-}
 
 let addons = [];
 
@@ -56,20 +44,6 @@ function removeAddon(id, el) {
     el.parentElement.remove();
 }
 
-function addToCart(slug) {
-    fetch(`/cart/add/${slug}`, {
-        method: 'POST',
-        headers: {
-            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-            'Accept': 'application/json'
-        }
-    })
-    .then(res => res.json())
-    .then(() => {
-        openCart();
-        loadCart();
-    });
-}
 
 
 $(document).ready(function () {

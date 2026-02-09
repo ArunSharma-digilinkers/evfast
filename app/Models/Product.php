@@ -12,6 +12,9 @@ class Product extends Model
         'slug',
         'price',
         'sale_price',
+        'gst_percentage',
+        'gst_type',
+        'shipping_type',
         'short_description',
         'technical_features',
         'warranty',
@@ -28,6 +31,30 @@ class Product extends Model
         'images' => 'array',
     ];
 
+    public function getBasePriceAttribute()
+    {
+        if ($this->gst_type === 'inclusive' && $this->gst_percentage > 0) {
+            return round($this->price / (1 + $this->gst_percentage / 100), 2);
+        }
+        return $this->price;
+    }
+
+    public function getGstAmountAttribute()
+    {
+        if ($this->gst_percentage > 0) {
+            return round($this->base_price * $this->gst_percentage / 100, 2);
+        }
+        return 0;
+    }
+
+    public function getTotalPriceAttribute()
+    {
+        if ($this->gst_type === 'extra') {
+            return round($this->price + $this->gst_amount, 2);
+        }
+        return $this->price;
+    }
+
     public function category()
     {
         return $this->belongsTo(Category::class, 'category_id');
@@ -35,7 +62,7 @@ class Product extends Model
 
     public function addons()
     {
-        return $this->belongsToMany(Addon::class);
+        return $this->belongsToMany(Product::class, 'product_addon', 'product_id', 'addon_id');
     }
 
     public function relatedProducts()
