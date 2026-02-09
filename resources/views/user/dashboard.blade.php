@@ -63,6 +63,11 @@
                                 <a href="{{ route('user.orders.show', $order->id) }}" class="btn btn-sm btn-outline-success" style="border-radius: 50px;">
                                     View
                                 </a>
+                                @if($order->invoice_number)
+                                    <a href="{{ route('invoice.download', $order->id) }}" class="btn btn-sm btn-outline-danger" style="border-radius: 50px;" title="Download Invoice">
+                                        <i class="fas fa-file-pdf"></i>
+                                    </a>
+                                @endif
                             </td>
                         </tr>
                         @endforeach
