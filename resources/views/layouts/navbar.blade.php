@@ -30,6 +30,59 @@
 
                     <li class="nav-item"><a class="nav-link" href="{{ url('blog') }}">Blog</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url('contact-us') }}">Contact Us</a></li>
+
+                    {{-- Cart --}}
+                    <li class="nav-item">
+                        <a class="nav-link position-relative" href="{{ route('cart.index') }}">
+                            <i class="fas fa-shopping-cart"></i>
+                            @php $cartCount = count(session('cart', [])); @endphp
+                            @if($cartCount > 0)
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 10px;">
+                                    {{ $cartCount }}
+                                </span>
+                            @endif
+                        </a>
+                    </li>
+
+                    @guest
+                        {{-- Login / Register --}}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('login') }}">
+                                <i class="fas fa-sign-in-alt me-1"></i>Login
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('register') }}">
+                                <i class="fas fa-user-plus me-1"></i>Register
+                            </a>
+                        </li>
+                    @else
+                        {{-- User Dropdown --}}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown"
+                               role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <img src="{{ auth()->user()->avatar_url }}" alt="" class="rounded-circle me-1"
+                                     style="width: 24px; height: 24px; object-fit: cover;">
+                                {{ auth()->user()->name }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                @if(auth()->user()->role === 'admin')
+                                    <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}"><i class="fas fa-tachometer-alt me-2"></i>Admin Panel</a></li>
+                                @else
+                                    <li><a class="dropdown-item" href="{{ route('user.dashboard') }}"><i class="fas fa-box me-2"></i>My Orders</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('user.addresses.index') }}"><i class="fas fa-map-marker-alt me-2"></i>Addresses</a></li>
+                                @endif
+                                <li><a class="dropdown-item" href="{{ route('profile.edit') }}"><i class="fas fa-user-edit me-2"></i>Profile</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form method="POST" action="{{ route('logout') }}">
+                                        @csrf
+                                        <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt me-2"></i>Logout</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    @endguest
                 </ul>
             </div>
         </div>

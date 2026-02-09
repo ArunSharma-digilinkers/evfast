@@ -31,6 +31,17 @@
                 </a>
             </li>
 
+            <li class="nav-item">
+                <a href="{{ route('admin.coupons.index') }}" class="nav-link">
+                    <i class="fas fa-ticket-alt me-2"></i> Coupons
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="{{ route('admin.shipping-zones.index') }}" class="nav-link">
+                    <i class="fas fa-truck me-2"></i> Shipping Zones
+                </a>
+            </li>
               <li class="nav-item">
                 <a href="{{ route('admin.blog.index') }}" class="nav-link">
                     <i class="fas fa-shopping-cart me-2"></i> Blog

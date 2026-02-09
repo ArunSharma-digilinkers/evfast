@@ -9,6 +9,11 @@ use App\Http\Controllers\FrontProductController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\Admin\AddonController;
+use App\Http\Controllers\Admin\CouponController;
+use App\Http\Controllers\Admin\ShippingZoneController;
+use App\Http\Controllers\RazorpayController;
+use App\Http\Controllers\UserDashboardController;
+use App\Http\Controllers\AddressController;
 use App\Http\Controllers\BlogController;
 use App\Models\Order;
 
@@ -38,8 +43,13 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('orders/{order}', [App\Http\Controllers\Admin\OrderController::class, 'show'])->name('orders.show');
     Route::post('orders/{order}/status', [App\Http\Controllers\Admin\OrderController::class, 'updateStatus'])->name('orders.updateStatus');
     Route::resource('addons', AddonController::class)->except('show');
+    Route::resource('coupons', CouponController::class)->except('show');
+    Route::resource('shipping-zones', ShippingZoneController::class)->except('show');
     Route::resource('blog', BlogController::class);
 });
+
+// Category products page
+Route::get('/category/{slug}', [FrontProductController::class, 'category'])->name('category.products');
 
 // Single product page
 Route::get('/product/{id}', [FrontProductController::class, 'show'])->name('product.show');
@@ -58,11 +68,12 @@ Route::prefix('admin')
 /* USER ROUTES */
 Route::prefix('user')
     ->middleware(['auth', 'role:user'])
+    ->name('user.')
     ->group(function () {
 
-        Route::get('/dashboard', function () {
-            return view('user.dashboard');
-        })->name('user.dashboard');
+        Route::get('/dashboard', [UserDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/orders/{order}', [UserDashboardController::class, 'showOrder'])->name('orders.show');
+        Route::resource('addresses', AddressController::class)->except(['show']);
 
     });
 
@@ -79,6 +90,19 @@ Route::get('/checkout', [CheckoutController::class, 'index'])
 
 Route::post('/checkout/place', [CheckoutController::class, 'placeOrder'])
     ->name('checkout.place');
+
+Route::post('/checkout/apply-coupon', [CheckoutController::class, 'applyCoupon'])
+    ->name('checkout.applyCoupon');
+
+Route::get('/checkout/remove-coupon', [CheckoutController::class, 'removeCoupon'])
+    ->name('checkout.removeCoupon');
+
+Route::get('/checkout/shipping-cost', [CheckoutController::class, 'getShippingCost'])
+    ->name('checkout.shippingCost');
+
+Route::get('/checkout/address/{address}', [CheckoutController::class, 'getAddress'])
+    ->middleware('auth')
+    ->name('checkout.getAddress');
 
 Route::get('/payment-success/{order}', function (Order $order) {
     return view('payment.success', compact('order'));
