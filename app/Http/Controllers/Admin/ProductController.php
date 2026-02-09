@@ -48,7 +48,7 @@ public function create()
             'image'       => 'required|image|mimes:jpg,jpeg,png,webp',
             'images.*'    => 'nullable|image|mimes:jpg,jpeg,png,webp',
             'addons'      => 'nullable|array',
-            'addons.*'    => 'exists:addons,id',
+            'addons.*'    => 'exists:products,id',
         ]);
 
         /* ---------- MAIN IMAGE ---------- */
@@ -75,6 +75,9 @@ public function create()
             'slug'                 => Str::slug($request->name),
             'price'                => $request->price,
             'sale_price'           => $request->sale_price,
+            'gst_percentage'       => $request->gst_percentage ?? 0,
+            'gst_type'             => $request->gst_type ?? 'inclusive',
+            'shipping_type'        => $request->shipping_type ?? 'free',
             'short_description'    => $request->short_description,
             'technical_features'   => $request->technical_features,
             'warranty'             => $request->warranty,
@@ -100,9 +103,9 @@ public function create()
     public function edit(Product $product)
     {
         $categories = Category::all();
-        $addons     = Addon::where('status', 1)->get();
+        $products   = Product::where('id', '!=', $product->id)->get();
 
-        return view('admin.products.edit', compact('product', 'categories', 'addons'));
+        return view('admin.products.edit', compact('product', 'categories', 'products'));
     }
 
     /**
@@ -119,7 +122,7 @@ public function create()
             'image'       => 'nullable|image|mimes:jpg,jpeg,png,webp',
             'images.*'    => 'nullable|image|mimes:jpg,jpeg,png,webp',
             'addons'      => 'nullable|array',
-            'addons.*'    => 'exists:addons,id',
+            'addons.*'    => 'exists:products,id',
         ]);
 
         $data = [
@@ -128,6 +131,9 @@ public function create()
             'slug'               => Str::slug($request->name),
             'price'              => $request->price,
             'sale_price'         => $request->sale_price,
+            'gst_percentage'     => $request->gst_percentage ?? 0,
+            'gst_type'           => $request->gst_type ?? 'inclusive',
+            'shipping_type'      => $request->shipping_type ?? 'free',
             'short_description'  => $request->short_description,
             'technical_features' => $request->technical_features,
             'warranty'           => $request->warranty,
