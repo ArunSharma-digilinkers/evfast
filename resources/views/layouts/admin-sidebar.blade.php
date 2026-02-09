@@ -31,6 +31,13 @@
                 </a>
             </li>
 
+              <li class="nav-item">
+                <a href="{{ route('admin.blog.index') }}" class="nav-link">
+                    <i class="fas fa-shopping-cart me-2"></i> Blog
+                </a>
+            </li>
+
+
 
             <li class="nav-item mt-4">
                 <form action="{{ route('logout') }}" method="POST">
