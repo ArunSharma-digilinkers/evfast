@@ -45,15 +45,24 @@
                     Total: ₹{{ number_format($order->total_amount) }}
                 </div>
 
-                <form action="{{ route('admin.orders.updateStatus', $order->id) }}" method="POST" class="mt-3">
-                    @csrf
-                    <select name="status" class="form-select w-25 d-inline-block">
-                        <option value="pending" {{ $order->status=='pending' ? 'selected' : '' }}>Pending</option>
-                        <option value="completed" {{ $order->status=='completed' ? 'selected' : '' }}>Completed</option>
-                        <option value="canceled" {{ $order->status=='canceled' ? 'selected' : '' }}>Canceled</option>
-                    </select>
-                    <button class="btn btn-success">Update Status</button>
-                </form>
+                <div class="mt-3 d-flex align-items-center gap-2 flex-wrap">
+                    <form action="{{ route('admin.orders.updateStatus', $order->id) }}" method="POST" class="d-flex align-items-center gap-2">
+                        @csrf
+                        <select name="status" class="form-select d-inline-block" style="width: auto;">
+                            <option value="pending" {{ $order->status=='pending' ? 'selected' : '' }}>Pending</option>
+                            <option value="dispatched" {{ $order->status=='dispatched' ? 'selected' : '' }}>Dispatched</option>
+                            <option value="completed" {{ $order->status=='completed' ? 'selected' : '' }}>Completed</option>
+                            <option value="canceled" {{ $order->status=='canceled' ? 'selected' : '' }}>Canceled</option>
+                        </select>
+                        <button class="btn btn-success">Update Status</button>
+                    </form>
+
+                    @if($order->invoice_number)
+                        <a href="{{ route('invoice.download', $order->id) }}" class="btn btn-outline-success">
+                            <i class="fas fa-file-pdf me-1"></i> Download Invoice
+                        </a>
+                    @endif
+                </div>
 
             </div>
         </div>

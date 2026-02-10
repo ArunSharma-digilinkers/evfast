@@ -58,7 +58,8 @@
                                     <div class="col-md-6">
                                         <!-- Product Name -->
                                         <div class="mb-3">
-                                            <label class="form-label">Product Name <span class="text-danger">*</span></label>
+                                            <label class="form-label">Product Name <span
+                                                    class="text-danger">*</span></label>
                                             <input type="text" name="name" value="{{ old('name', $product->name) }}"
                                                 class="form-control" required>
                                         </div>
@@ -212,7 +213,7 @@
                                         Cancel
                                     </a>
 
-                                    <button type="submit" class="btn btn-primary px-4">
+                                    <button type="submit" class="btn btn-warning px-4">
                                         <i class="fas fa-save me-2"></i> Update Product
                                     </button>
                                 </div>

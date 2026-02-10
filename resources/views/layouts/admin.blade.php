@@ -2,16 +2,12 @@
 
 @include('layouts.admin-navigation')
 
+{{-- Sidebar --}}
+@include('layouts.admin-sidebar')
+
 {{-- Main Content --}}
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-lg-3 col-md-4 admin-sidebar mt-4">
-            @include('layouts.admin-sidebar')
-        </div>
-        <div class="col-lg-9 col-md-8 admin-content">
-            @yield('content')
-        </div>
-    </div>
+<div class="admin-main-content">
+    @yield('content')
 </div>
 
 @include('layouts.admin-footer')
