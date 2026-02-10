@@ -15,6 +15,7 @@ use App\Http\Controllers\RazorpayController;
 use App\Http\Controllers\UserDashboardController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\BlogController;
+use App\Http\Controllers\InvoiceController;
 use App\Models\Order;
 
 Route::get('/', [PagesController::class, 'index']);
@@ -46,6 +47,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('coupons', CouponController::class)->except('show');
     Route::resource('shipping-zones', ShippingZoneController::class)->except('show');
     Route::resource('blog', BlogController::class);
+    Route::resource('abandoned-checkouts', App\Http\Controllers\Admin\AbandonedCheckoutController::class)->only(['index', 'show', 'destroy']);
 });
 
 // Category products page
@@ -59,9 +61,7 @@ Route::prefix('admin')
     ->middleware(['auth', 'role:admin'])
     ->group(function () {
 
-        Route::get('/dashboard', function () {
-            return view('admin.dashboard');
-        })->name('admin.dashboard');
+        Route::get('/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('admin.dashboard');
 
     });
 
@@ -100,6 +100,9 @@ Route::get('/checkout/remove-coupon', [CheckoutController::class, 'removeCoupon'
 Route::get('/checkout/shipping-cost', [CheckoutController::class, 'getShippingCost'])
     ->name('checkout.shippingCost');
 
+Route::post('/checkout/save-abandoned', [CheckoutController::class, 'saveAbandonedCheckout'])
+    ->name('checkout.saveAbandoned');
+
 Route::get('/checkout/address/{address}', [CheckoutController::class, 'getAddress'])
     ->middleware('auth')
     ->name('checkout.getAddress');
@@ -108,8 +111,14 @@ Route::get('/payment-success/{order}', function (Order $order) {
     return view('payment.success', compact('order'));
 })->name('payment.success');
 
+// Invoice downloads
+Route::get('/invoice/{order}', [InvoiceController::class, 'download'])
+    ->middleware('auth')
+    ->name('invoice.download');
 
-
+Route::post('/admin/invoices/bulk-download', [InvoiceController::class, 'bulkDownload'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.invoices.bulk');
 
 
 

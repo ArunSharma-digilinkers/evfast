@@ -125,10 +125,18 @@
                         <div><span class="badge bg-success">{{ strtoupper($order->payment_status) }}</span></div>
                     </div>
 
-                    <div>
+                    <div class="mb-2">
                         <small class="text-muted">Payment ID</small>
                         <div class="text-break" style="font-size: 13px;">{{ $order->payment_id }}</div>
                     </div>
+
+                    @if($order->invoice_number)
+                    <div class="mt-3">
+                        <a href="{{ route('invoice.download', $order->id) }}" class="btn btn-outline-success btn-sm w-100" style="border-radius: 50px;">
+                            <i class="fas fa-file-pdf me-1"></i> Download Invoice
+                        </a>
+                    </div>
+                    @endif
                 </div>
 
                 {{-- Delivery Address --}}

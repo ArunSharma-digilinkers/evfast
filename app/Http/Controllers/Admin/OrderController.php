@@ -25,7 +25,7 @@ class OrderController extends Controller
     // Optional: update order status
     public function updateStatus(Request $request, Order $order)
     {
-        $order->update(['payment_status' => $request->status]);
-        return redirect()->back()->with('success', 'Order status updated successfully');
+        $order->update(['status' => $request->status]);
+        return redirect()->route('admin.orders.index')->with('success', 'Order #' . $order->id . ' status updated to ' . ucfirst($request->status));
     }
 }
