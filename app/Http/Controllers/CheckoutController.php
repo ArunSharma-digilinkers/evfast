@@ -10,6 +10,7 @@ use App\Models\Coupon;
 use App\Models\User;
 use App\Models\Address;
 use App\Models\ShippingZone;
+use App\Models\AbandonedCheckout;
 use App\Mail\OrderConfirmation;
 use App\Mail\NewOrderAdmin;
 use App\Mail\WelcomeNewUser;
@@ -51,14 +52,16 @@ class CheckoutController extends Controller
 
     public function applyCoupon(Request $request)
     {
-        $request->validate([
-            'coupon_code' => 'required|string',
-        ]);
+        $code = strtoupper(trim($request->input('coupon_code', '')));
 
-        $coupon = Coupon::where('code', strtoupper($request->coupon_code))->first();
+        if (!$code) {
+            return response()->json(['success' => false, 'message' => 'Please enter a coupon code.']);
+        }
+
+        $coupon = Coupon::where('code', $code)->first();
 
         if (!$coupon) {
-            return redirect()->back()->with('coupon_error', 'Invalid coupon code.');
+            return response()->json(['success' => false, 'message' => 'Invalid coupon code.']);
         }
 
         $cart = session()->get('cart', []);
@@ -81,18 +84,37 @@ class CheckoutController extends Controller
             } elseif ($coupon->min_order_amount && $subtotal < $coupon->min_order_amount) {
                 $message = 'Minimum order of ₹' . number_format($coupon->min_order_amount, 2) . ' required.';
             }
-            return redirect()->back()->with('coupon_error', $message);
+            return response()->json(['success' => false, 'message' => $message]);
         }
 
         session(['coupon_code' => $coupon->code]);
 
-        return redirect()->back()->with('coupon_success', 'Coupon applied successfully!');
+        $summary = $this->calculateSummary($cart, $coupon);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Coupon applied successfully!',
+            'coupon' => [
+                'code' => $coupon->code,
+                'type' => $coupon->type,
+                'value' => $coupon->value,
+            ],
+            'summary' => $summary,
+        ]);
     }
 
     public function removeCoupon()
     {
         session()->forget('coupon_code');
-        return redirect()->back()->with('coupon_success', 'Coupon removed.');
+
+        $cart = session()->get('cart', []);
+        $summary = $this->calculateSummary($cart, null);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Coupon removed.',
+            'summary' => $summary,
+        ]);
     }
 
     public function getShippingCost(Request $request)
@@ -125,6 +147,51 @@ class CheckoutController extends Controller
         }
 
         return response()->json($address);
+    }
+
+    public function saveAbandonedCheckout(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string',
+            'email' => 'required|email',
+            'phone' => 'required|string',
+        ]);
+
+        $cart = session()->get('cart', []);
+        if (empty($cart)) {
+            return response()->json(['success' => false]);
+        }
+
+        $cartData = [];
+        foreach ($cart as $slug => $item) {
+            $cartData[] = [
+                'name' => $item['name'],
+                'quantity' => $item['quantity'],
+                'price' => $item['price'],
+                'image' => $item['image'] ?? null,
+            ];
+        }
+
+        AbandonedCheckout::updateOrCreate(
+            [
+                'email' => $request->email,
+                'recovered' => false,
+            ],
+            [
+                'user_id' => auth()->id(),
+                'name' => $request->name,
+                'phone' => $request->phone,
+                'address' => $request->address,
+                'pincode' => $request->pincode,
+                'state' => $request->state,
+                'city' => $request->city,
+                'cart_data' => $cartData,
+                'total_amount' => $request->total_amount ?? 0,
+                'coupon_code' => session('coupon_code'),
+            ]
+        );
+
+        return response()->json(['success' => true]);
     }
 
     public function placeOrder(Request $request)
@@ -239,6 +306,7 @@ class CheckoutController extends Controller
                 'payment_method' => 'razorpay',
                 'payment_status' => 'paid',
                 'payment_id' => $payment->id,
+                'invoice_number' => Order::generateInvoiceNumber(),
             ]);
 
             // Save Order Items + Reduce Stock
@@ -280,6 +348,13 @@ class CheckoutController extends Controller
             }
 
             DB::commit();
+
+            // Mark abandoned checkout as recovered
+            AbandonedCheckout::where('email', $order->email)
+                ->where('recovered', false)
+                ->latest()
+                ->first()
+                ?->update(['recovered' => true, 'recovered_order_id' => $order->id]);
 
             // Send emails (outside transaction so failures don't break checkout)
             try {

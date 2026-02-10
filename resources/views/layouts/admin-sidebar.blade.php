@@ -1,50 +1,63 @@
-<div class="d-flex sidebar-top">
     <!-- Sidebar -->
-    <nav class="admin-sidebar bg-dark text-white p-4">
+    <nav class="admin-sidebar bg-dark text-white">
         <h4 class="text-center mb-4 fw-bold">
             <i class="fas fa-user-shield me-2"></i> Admin Panel
         </h4>
 
         <ul class="nav flex-column gap-1">
             <li class="nav-item">
-                <a href="{{ route('admin.dashboard') }}" class="nav-link active">
+                <a href="{{ route('admin.dashboard') }}"
+                    class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                     <i class="fas fa-home me-2"></i> Dashboard
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="{{ route('admin.categories.index') }}" class="nav-link">
+                <a href="{{ route('admin.categories.index') }}"
+                    class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
                     <i class="fas fa-layer-group me-2"></i> Product Categories
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="{{ route('admin.products.index') }}" class="nav-link">
+                <a href="{{ route('admin.products.index') }}"
+                    class="nav-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
                     <i class="fas fa-box-open me-2"></i> Products
                 </a>
             </li>
 
-          
             <li class="nav-item">
-                <a href="{{ route('admin.orders.index') }}" class="nav-link">
+                <a href="{{ route('admin.orders.index') }}"
+                    class="nav-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
                     <i class="fas fa-shopping-cart me-2"></i> Orders
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="{{ route('admin.coupons.index') }}" class="nav-link">
+                <a href="{{ route('admin.abandoned-checkouts.index') }}"
+                    class="nav-link {{ request()->routeIs('admin.abandoned-checkouts.*') ? 'active' : '' }}">
+                    <i class="fas fa-cart-arrow-down me-2"></i> Abandoned Checkouts
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="{{ route('admin.coupons.index') }}"
+                    class="nav-link {{ request()->routeIs('admin.coupons.*') ? 'active' : '' }}">
                     <i class="fas fa-ticket-alt me-2"></i> Coupons
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="{{ route('admin.shipping-zones.index') }}" class="nav-link">
+                <a href="{{ route('admin.shipping-zones.index') }}"
+                    class="nav-link {{ request()->routeIs('admin.shipping-zones.*') ? 'active' : '' }}">
                     <i class="fas fa-truck me-2"></i> Shipping Zones
                 </a>
             </li>
-              <li class="nav-item">
-                <a href="{{ route('admin.blog.index') }}" class="nav-link">
-                    <i class="fas fa-shopping-cart me-2"></i> Blog
+
+            <li class="nav-item">
+                <a href="{{ route('admin.blog.index') }}"
+                    class="nav-link {{ request()->routeIs('admin.blog.*') ? 'active' : '' }}">
+                    <i class="fas fa-blog me-2"></i> Blog
                 </a>
             </li>
 
@@ -60,4 +73,3 @@
             </li>
         </ul>
     </nav>
-</div>

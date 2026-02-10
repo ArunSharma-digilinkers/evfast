@@ -46,7 +46,9 @@
                                             <select name="category_id" class="form-select" required>
                                                 <option value="">Select Category</option>
                                                 @foreach ($categories as $cat)
-                                                    <option value="{{ $cat->id }}" {{ old('category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+                                                    <option value="{{ $cat->id }}"
+                                                        {{ old('category_id') == $cat->id ? 'selected' : '' }}>
+                                                        {{ $cat->name }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -85,13 +87,13 @@
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">MRP (₹) <span class="text-danger">*</span></label>
-                                        <input type="number" name="sale_price" class="form-control"
-                                            placeholder="Enter sales price" value="{{ old('sale_price') }}" required>
+                                        <input type="number" name="sale_price" class="form-control" placeholder="Enter MRP"
+                                            value="{{ old('sale_price') }}" required>
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Price (₹) <span class="text-danger">*</span></label>
                                         <input type="number" name="price" class="form-control"
-                                            placeholder="Enter MRP price" value="{{ old('price') }}" required>
+                                            placeholder="Enter sale price" value="{{ old('price') }}" required>
                                     </div>
 
                                     <div class="col-md-4 mb-3">
@@ -105,7 +107,8 @@
                                             <option value="inclusive"
                                                 {{ old('gst_type') === 'inclusive' ? 'selected' : '' }}>Inclusive (Price
                                                 includes GST)</option>
-                                            <option value="extra" {{ old('gst_type') === 'extra' ? 'selected' : '' }}>Extra
+                                            <option value="extra" {{ old('gst_type') === 'extra' ? 'selected' : '' }}>
+                                                Extra
                                                 (GST added on top)</option>
                                         </select>
                                     </div>

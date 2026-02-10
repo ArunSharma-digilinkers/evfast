@@ -36,7 +36,13 @@ public function store(LoginRequest $request): RedirectResponse
         ]);
     }
 
+    $redirectUrl = $request->input('redirect');
+
     $request->session()->regenerate();
+
+    if ($redirectUrl && str_starts_with($redirectUrl, url('/'))) {
+        return redirect($redirectUrl);
+    }
 
     if (auth()->user()->role === 'admin') {
         return redirect()->route('admin.dashboard');

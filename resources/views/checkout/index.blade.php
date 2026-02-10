@@ -135,24 +135,20 @@
 
                     <hr>
 
-                    <div class="d-flex justify-content-between mb-2">
+                    <div class="d-flex justify-content-between mb-2" id="subtotal-row">
                         <span class="text-muted">Subtotal</span>
-                        <span>₹{{ number_format($summary['subtotal'], 2) }}</span>
+                        <span id="subtotal-display">₹{{ number_format($summary['subtotal'], 2) }}</span>
                     </div>
 
-                    @if($summary['discount'] > 0)
-                        <div class="d-flex justify-content-between mb-2 text-success">
-                            <span>Discount ({{ $coupon->code }})</span>
-                            <span>- ₹{{ number_format($summary['discount'], 2) }}</span>
-                        </div>
-                    @endif
+                    <div class="d-flex justify-content-between mb-2 text-success" id="discount-row" style="{{ $summary['discount'] > 0 ? '' : 'display:none !important;' }}">
+                        <span id="discount-label">{{ $coupon ? 'Discount (' . $coupon->code . ')' : 'Discount' }}</span>
+                        <span id="discount-display">- ₹{{ number_format($summary['discount'], 2) }}</span>
+                    </div>
 
-                    @if($summary['gst_total'] > 0)
-                        <div class="d-flex justify-content-between mb-2">
-                            <span class="text-muted">GST</span>
-                            <span>+ ₹{{ number_format($summary['gst_total'], 2) }}</span>
-                        </div>
-                    @endif
+                    <div class="d-flex justify-content-between mb-2" id="gst-row" style="{{ $summary['gst_total'] > 0 ? '' : 'display:none;' }}">
+                        <span class="text-muted">GST</span>
+                        <span id="gst-display">+ ₹{{ number_format($summary['gst_total'], 2) }}</span>
+                    </div>
 
                     <div class="d-flex justify-content-between mb-2">
                         <span class="text-muted">Shipping</span>
@@ -174,47 +170,41 @@
                 </div>
 
                 {{-- Coupon Section --}}
-                <div class="mb-4">
-                    @if($coupon)
-                        <div class="border rounded p-4">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="badge bg-success px-3 py-2">
+                <div class="mb-4" id="coupon-section">
+                    {{-- Applied coupon display --}}
+                    <div id="coupon-applied" class="border rounded p-4" style="display: {{ $coupon ? 'block' : 'none' }};">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="badge bg-success px-3 py-2" id="coupon-badge">
+                                @if($coupon)
                                     <i class="fas fa-tag me-1"></i> {{ $coupon->code }}
                                     @if($coupon->type === 'percentage')
                                         ({{ $coupon->value }}% off)
                                     @else
                                         (₹{{ number_format($coupon->value, 2) }} off)
                                     @endif
-                                </span>
-                                <a href="{{ route('checkout.removeCoupon') }}" class="text-danger small text-decoration-underline">Remove</a>
-                            </div>
+                                @endif
+                            </span>
+                            <a href="#" onclick="removeCoupon(); return false;" class="text-danger small text-decoration-underline">Remove</a>
                         </div>
-                    @else
+                    </div>
+
+                    {{-- Coupon input form --}}
+                    <div id="coupon-form-wrap" style="display: {{ $coupon ? 'none' : 'block' }};">
                         <div class="form-check mb-0">
                             <input class="form-check-input" type="checkbox" id="coupon-toggle"
-                                   {{ session('coupon_error') ? 'checked' : '' }}
                                    onchange="document.getElementById('coupon-box').style.display = this.checked ? 'block' : 'none'">
                             <label class="form-check-label" for="coupon-toggle">Have a coupon code?</label>
                         </div>
 
-                        <div id="coupon-box" class="border rounded p-4 mt-3" style="display: {{ session('coupon_error') ? 'block' : 'none' }};">
-                            @if(session('coupon_error'))
-                                <div class="alert alert-danger py-2 mb-3">{{ session('coupon_error') }}</div>
-                            @endif
-                            @if(session('coupon_success'))
-                                <div class="alert alert-success py-2 mb-3">{{ session('coupon_success') }}</div>
-                            @endif
-
-                            <form action="{{ route('checkout.applyCoupon') }}" method="POST">
-                                @csrf
-                                <div class="input-group">
-                                    <input type="text" name="coupon_code" class="form-control"
-                                           placeholder="Enter coupon code" style="text-transform: uppercase;">
-                                    <button class="btn btn-outline-success" type="submit">Apply</button>
-                                </div>
-                            </form>
+                        <div id="coupon-box" class="border rounded p-4 mt-3" style="display: none;">
+                            <div id="coupon-message"></div>
+                            <div class="input-group">
+                                <input type="text" id="coupon-input" class="form-control"
+                                       placeholder="Enter coupon code" style="text-transform: uppercase;">
+                                <button class="btn btn-outline-success" type="button" id="coupon-apply-btn" onclick="applyCoupon()">Apply</button>
+                            </div>
                         </div>
-                    @endif
+                    </div>
                 </div>
 
                 {{-- Pay Button --}}
@@ -346,7 +336,28 @@ function payWithRazorpay() {
     };
 
     let rzp = new Razorpay(options);
-    rzp.open();
+
+    // Save checkout attempt before opening payment (for abandoned checkout tracking)
+    fetch("{{ route('checkout.saveAbandoned') }}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({
+            name: name,
+            email: email,
+            phone: phone,
+            address: form.querySelector('[name="address"]').value,
+            pincode: form.querySelector('[name="pincode"]').value,
+            state: state,
+            city: form.querySelector('[name="city"]').value,
+            total_amount: finalAmount
+        })
+    })
+    .then(() => rzp.open())
+    .catch(() => rzp.open());
 }
 
 // Auto-trigger if state was pre-selected (e.g. from old() after validation error)
@@ -384,6 +395,115 @@ function fillAddress(addressId, el) {
     .catch(() => {
         alert('Could not load address. Please try again.');
     });
+}
+
+function applyCoupon() {
+    let input = document.getElementById('coupon-input');
+    let code = input.value.trim();
+    let msgEl = document.getElementById('coupon-message');
+    let btn = document.getElementById('coupon-apply-btn');
+
+    if (!code) {
+        msgEl.innerHTML = '<div class="alert alert-danger py-2 mb-3">Please enter a coupon code.</div>';
+        return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Applying...';
+    msgEl.innerHTML = '';
+
+    fetch("{{ route('checkout.applyCoupon') }}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ coupon_code: code })
+    })
+    .then(res => res.json())
+    .then(data => {
+        btn.disabled = false;
+        btn.textContent = 'Apply';
+
+        if (!data.success) {
+            msgEl.innerHTML = '<div class="alert alert-danger py-2 mb-3">' + data.message + '</div>';
+            return;
+        }
+
+        // Update summary values with coupon code for label
+        updateSummaryFromServer(data.summary, data.coupon.code);
+
+        // Show applied coupon badge
+        let label = data.coupon.type === 'percentage'
+            ? data.coupon.code + ' (' + data.coupon.value + '% off)'
+            : data.coupon.code + ' (₹' + Number(data.coupon.value).toLocaleString('en-IN') + ' off)';
+        document.getElementById('coupon-badge').innerHTML = '<i class="fas fa-tag me-1"></i> ' + label;
+        document.getElementById('coupon-applied').style.display = 'block';
+        document.getElementById('coupon-form-wrap').style.display = 'none';
+    })
+    .catch(() => {
+        btn.disabled = false;
+        btn.textContent = 'Apply';
+        msgEl.innerHTML = '<div class="alert alert-danger py-2 mb-3">Something went wrong. Please try again.</div>';
+    });
+}
+
+function removeCoupon() {
+    fetch("{{ route('checkout.removeCoupon') }}", {
+        headers: { 'Accept': 'application/json' }
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            updateSummaryFromServer(data.summary);
+
+            // Hide applied, show form
+            document.getElementById('coupon-applied').style.display = 'none';
+            document.getElementById('coupon-form-wrap').style.display = 'block';
+            document.getElementById('coupon-toggle').checked = false;
+            document.getElementById('coupon-box').style.display = 'none';
+            document.getElementById('coupon-input').value = '';
+            document.getElementById('coupon-message').innerHTML = '';
+
+            // Hide discount row
+            document.getElementById('discount-row').style.setProperty('display', 'none', 'important');
+        }
+    })
+    .catch(() => {
+        alert('Could not remove coupon. Please try again.');
+    });
+}
+
+function updateSummaryFromServer(summary, couponCode) {
+    baseSubtotal = summary.subtotal;
+    baseDiscount = summary.discount;
+    baseGst = summary.gst_total;
+
+    // Update discount row - only show when coupon is applied and discount > 0
+    let discountRow = document.getElementById('discount-row');
+    if (couponCode && summary.discount > 0) {
+        discountRow.style.setProperty('display', 'flex', 'important');
+        document.getElementById('discount-label').textContent = 'Discount (' + couponCode + ')';
+        document.getElementById('discount-display').textContent = '- ₹' + Number(summary.discount).toFixed(2);
+    } else {
+        discountRow.style.setProperty('display', 'none', 'important');
+    }
+
+    // Update subtotal display
+    document.getElementById('subtotal-display').textContent = '₹' + Number(summary.subtotal).toFixed(2);
+
+    // Update GST display
+    let gstRow = document.getElementById('gst-row');
+    if (summary.gst_total > 0) {
+        gstRow.style.display = '';
+        document.getElementById('gst-display').textContent = '+ ₹' + Number(summary.gst_total).toFixed(2);
+    } else {
+        gstRow.style.display = 'none';
+    }
+
+    // Recalc total with current shipping
+    recalcTotal(currentShipping);
 }
 </script>
 

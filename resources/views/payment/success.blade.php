@@ -70,16 +70,21 @@
 
         <!-- Buttons -->
         <div class="action-buttons">
-            <a href="{{ url('/') }}" class="btn btn-outline-primary">
+            <a href="{{ url('/') }}" class="btn btn-submit">
                 Continue Shopping
             </a>
             @auth
+                @if($order->invoice_number)
+                    <a href="{{ route('invoice.download', $order->id) }}" class="btn btn-outline-success">
+                        <i class="fas fa-file-pdf me-1"></i> Download Invoice
+                    </a>
+                @endif
                 @if(auth()->user()->role === 'admin')
-                    <a href="{{ route('admin.orders.show', $order->id) }}" class="btn btn-primary">
+                    <a href="{{ route('admin.orders.show', $order->id) }}" class="btn btn-submit">
                         View Order
                     </a>
                 @else
-                    <a href="{{ route('user.orders.show', $order->id) }}" class="btn btn-primary">
+                    <a href="{{ route('user.orders.show', $order->id) }}" class="btn btn-submit">
                         View Order
                     </a>
                 @endif
