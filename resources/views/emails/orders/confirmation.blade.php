@@ -93,12 +93,25 @@
             </div>
 
             <div class="address-box">
-                <strong>Delivery Address:</strong><br>
+                <strong>Billing Address:</strong><br>
                 {{ $order->name }}<br>
                 {{ $order->address }}<br>
                 {{ $order->city }}, {{ $order->state }} - {{ $order->pincode }}<br>
                 Phone: {{ $order->phone }}
+                @if($order->gstin)
+                    <br>GSTIN: {{ $order->gstin }}
+                @endif
             </div>
+
+            @if($order->has_separate_shipping)
+            <div class="address-box" style="margin-top: 10px;">
+                <strong>Shipping Address:</strong><br>
+                {{ $order->shipping_name }}<br>
+                {{ $order->shipping_address }}<br>
+                {{ $order->shipping_city }}, {{ $order->shipping_state }} - {{ $order->shipping_pincode }}<br>
+                Phone: {{ $order->shipping_phone }}
+            </div>
+            @endif
 
             <p style="margin-top: 20px;">Payment ID: <strong>{{ $order->payment_id }}</strong></p>
         </div>
