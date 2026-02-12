@@ -85,16 +85,17 @@
 
                                 <!-- Price -->
                                 <div class="row">
+                                     <div class="col-md-6 mb-3">
+                                        <label class="form-label">Price (₹) <span class="text-danger">*</span></label>
+                                        <input type="number" name="price" class="form-control"
+                                            placeholder="Enter sale price" value="{{ old('price') }}" required>
+                                    </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">MRP (₹) <span class="text-danger">*</span></label>
                                         <input type="number" name="sale_price" class="form-control" placeholder="Enter MRP"
                                             value="{{ old('sale_price') }}" required>
                                     </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Price (₹) <span class="text-danger">*</span></label>
-                                        <input type="number" name="price" class="form-control"
-                                            placeholder="Enter sale price" value="{{ old('price') }}" required>
-                                    </div>
+                                   
 
                                     <div class="col-md-4 mb-3">
                                         <label class="form-label">GST Percentage (%)</label>

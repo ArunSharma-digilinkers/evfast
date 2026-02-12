@@ -1,7 +1,7 @@
     <!-- Sidebar -->
     <nav class="admin-sidebar bg-dark text-white">
-        <h4 class="text-center mb-4 fw-bold">
-            <i class="fas fa-user-shield me-2"></i> Admin Panel
+        <h4 class="text-center mb-4 fw-bold text-white">
+            <i class="fas fa-user-shield me-2 text-white"></i> Admin Panel
         </h4>
 
         <ul class="nav flex-column gap-1">
