@@ -47,9 +47,21 @@
                     <span>{{ $order->phone }}</span>
                 </div>
                 <div class="info-row">
-                    <span class="info-label">Address:</span>
+                    <span class="info-label">Billing Address:</span>
                     <span>{{ $order->address }}, {{ $order->city }}, {{ $order->state }} - {{ $order->pincode }}</span>
                 </div>
+                @if($order->gstin)
+                <div class="info-row">
+                    <span class="info-label">GSTIN:</span>
+                    <span>{{ $order->gstin }}</span>
+                </div>
+                @endif
+                @if($order->has_separate_shipping)
+                <div class="info-row">
+                    <span class="info-label">Shipping To:</span>
+                    <span>{{ $order->shipping_name }} — {{ $order->shipping_address }}, {{ $order->shipping_city }}, {{ $order->shipping_state }} - {{ $order->shipping_pincode }}</span>
+                </div>
+                @endif
                 <div class="info-row">
                     <span class="info-label">Payment ID:</span>
                     <span>{{ $order->payment_id }}</span>

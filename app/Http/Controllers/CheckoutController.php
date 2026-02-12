@@ -41,13 +41,15 @@ class CheckoutController extends Controller
 
         $addresses = collect();
         $defaultAddress = null;
+        $userGstin = '';
 
         if (auth()->check()) {
             $addresses = auth()->user()->addresses()->latest()->get();
             $defaultAddress = auth()->user()->defaultAddress();
+            $userGstin = auth()->user()->gstin ?? '';
         }
 
-        return view('checkout.index', compact('cart', 'coupon', 'summary', 'addresses', 'defaultAddress'));
+        return view('checkout.index', compact('cart', 'coupon', 'summary', 'addresses', 'defaultAddress', 'userGstin'));
     }
 
     public function applyCoupon(Request $request)
@@ -121,23 +123,37 @@ class CheckoutController extends Controller
     {
         $state = $request->query('state');
         if (!$state) {
-            return response()->json(['shipping' => 0, 'free' => true]);
+            return response()->json(['shipping' => 0, 'free' => true, 'shipping_gst' => 0]);
         }
 
         $cart = session()->get('cart', []);
-        $hasZoneProduct = false;
+        $cartProducts = [];
         $subtotal = 0;
+        $maxGstPercentage = 0;
 
         foreach ($cart as $slug => $item) {
             $product = Product::where('slug', $slug)->first();
             if (!$product) continue;
+
             $subtotal += $product->base_price * $item['quantity'];
-            if ($product->shipping_type === 'zone') {
-                $hasZoneProduct = true;
+            $cartProducts[] = ['product' => $product, 'quantity' => $item['quantity']];
+
+            if ($product->gst_percentage > $maxGstPercentage) {
+                $maxGstPercentage = $product->gst_percentage;
             }
         }
 
-        return response()->json(ShippingZone::getShippingCost($state, $subtotal, $hasZoneProduct));
+        $result = ShippingZone::getShippingCost($state, $subtotal, $cartProducts);
+
+        // Calculate GST on shipping at the highest product GST rate
+        $shippingGst = 0;
+        if (!isset($result['error']) && $result['shipping'] > 0 && $maxGstPercentage > 0) {
+            $shippingGst = round($result['shipping'] * $maxGstPercentage / 100, 2);
+        }
+
+        $result['shipping_gst'] = $shippingGst;
+
+        return response()->json($result);
     }
 
     public function getAddress(Address $address)
@@ -211,6 +227,14 @@ class CheckoutController extends Controller
             'state'   => 'required|string',
             'city'    => 'required|string',
             'address' => 'required|min:10',
+            'gstin'   => ['nullable', 'regex:/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/'],
+            'ship_to_different' => 'nullable|boolean',
+            'shipping_name'    => 'required_if:ship_to_different,1|nullable|string|min:3',
+            'shipping_phone'   => 'required_if:ship_to_different,1|nullable|digits:10',
+            'shipping_pincode' => 'required_if:ship_to_different,1|nullable|digits:6',
+            'shipping_state'   => 'required_if:ship_to_different,1|nullable|string',
+            'shipping_city'    => 'required_if:ship_to_different,1|nullable|string',
+            'shipping_address' => 'required_if:ship_to_different,1|nullable|min:10',
             'payment_method' => 'required|in:razorpay',
             'razorpay_payment_id' => 'required|string',
         ]);
@@ -221,26 +245,41 @@ class CheckoutController extends Controller
             $coupon = Coupon::where('code', $couponCode)->first();
         }
 
-        // Calculate shipping based on cart products and customer state
-        $hasZoneProduct = false;
-        foreach ($cart as $slug => $item) {
-            $product = Product::where('slug', $slug)->first();
-            if ($product && $product->shipping_type === 'zone') {
-                $hasZoneProduct = true;
-                break;
+        $summary = $this->calculateSummary($cart, $coupon);
+
+        // Build cart products array for shipping calculation
+        $cartProducts = [];
+        foreach ($summary['items'] as $itemData) {
+            $product = Product::find($itemData['product_id']);
+            if ($product) {
+                $cartProducts[] = ['product' => $product, 'quantity' => $itemData['quantity']];
             }
         }
 
-        $summary = $this->calculateSummary($cart, $coupon);
-        $shippingResult = ShippingZone::getShippingCost($request->state, $summary['subtotal'], $hasZoneProduct);
+        $shipToDifferent = (bool) $request->input('ship_to_different');
+        $shippingState = $shipToDifferent ? $request->shipping_state : $request->state;
+
+        $shippingResult = ShippingZone::getShippingCost($shippingState, $summary['subtotal'], $cartProducts);
 
         if (isset($shippingResult['error'])) {
             return redirect()->back()->with('error', $shippingResult['error']);
         }
 
         $shippingAmount = $shippingResult['shipping'];
+
+        // Calculate GST on shipping at the highest product GST rate
+        $shippingGst = 0;
+        if ($shippingAmount > 0 && $summary['max_gst_percentage'] > 0) {
+            $shippingGst = round($shippingAmount * $summary['max_gst_percentage'] / 100, 2);
+        }
+
+        // Consolidated GST = product GST + shipping GST
+        $consolidatedGst = round($summary['gst_total'] + $shippingGst, 2);
+
         $summary['shipping'] = $shippingAmount;
-        $summary['grand_total'] = round($summary['discounted_subtotal'] + $summary['gst_total'] + $shippingAmount);
+        $summary['shipping_gst'] = $shippingGst;
+        $summary['gst_total'] = $consolidatedGst;
+        $summary['grand_total'] = round($summary['discounted_subtotal'] + $consolidatedGst + $shippingAmount);
 
         DB::beginTransaction();
 
@@ -297,12 +336,20 @@ class CheckoutController extends Controller
                 'pincode' => $request->pincode,
                 'state' => $request->state,
                 'city' => $request->city,
+                'gstin' => $request->gstin ?: null,
+                'shipping_name' => $shipToDifferent ? $request->shipping_name : null,
+                'shipping_phone' => $shipToDifferent ? $request->shipping_phone : null,
+                'shipping_address' => $shipToDifferent ? $request->shipping_address : null,
+                'shipping_pincode' => $shipToDifferent ? $request->shipping_pincode : null,
+                'shipping_state' => $shipToDifferent ? $request->shipping_state : null,
+                'shipping_city' => $shipToDifferent ? $request->shipping_city : null,
                 'total_amount' => $summary['grand_total'],
                 'coupon_id' => $coupon?->id,
                 'discount_amount' => $summary['discount'],
                 'subtotal' => $summary['subtotal'],
                 'gst_total' => $summary['gst_total'],
                 'shipping_amount' => $summary['shipping'],
+                'shipping_gst' => $summary['shipping_gst'],
                 'payment_method' => 'razorpay',
                 'payment_status' => 'paid',
                 'payment_id' => $payment->id,
@@ -332,11 +379,16 @@ class CheckoutController extends Controller
                 $coupon->increment('used_count');
             }
 
+            // Save GSTIN to user profile
+            if ($request->gstin) {
+                $user->update(['gstin' => $request->gstin]);
+            }
+
             // Save address for new users
             if ($isNewUser) {
                 Address::create([
                     'user_id' => $user->id,
-                    'label' => 'Home',
+                    'label' => 'Billing',
                     'name' => $request->name,
                     'phone' => $request->phone,
                     'address' => $request->address,
@@ -345,6 +397,20 @@ class CheckoutController extends Controller
                     'city' => $request->city,
                     'is_default' => true,
                 ]);
+
+                if ($shipToDifferent) {
+                    Address::create([
+                        'user_id' => $user->id,
+                        'label' => 'Shipping',
+                        'name' => $request->shipping_name,
+                        'phone' => $request->shipping_phone,
+                        'address' => $request->shipping_address,
+                        'pincode' => $request->shipping_pincode,
+                        'state' => $request->shipping_state,
+                        'city' => $request->shipping_city,
+                        'is_default' => false,
+                    ]);
+                }
             }
 
             DB::commit();
@@ -391,6 +457,7 @@ class CheckoutController extends Controller
     {
         $items = [];
         $subtotal = 0;
+        $maxGstPercentage = 0;
 
         foreach ($cart as $slug => $item) {
             $product = Product::where('slug', $slug)->first();
@@ -399,6 +466,10 @@ class CheckoutController extends Controller
             $itemBasePrice = $product->base_price;
             $itemSubtotal = $itemBasePrice * $item['quantity'];
             $subtotal += $itemSubtotal;
+
+            if ($product->gst_percentage > $maxGstPercentage) {
+                $maxGstPercentage = $product->gst_percentage;
+            }
 
             $items[$slug] = [
                 'product_id' => $product->id,
@@ -445,7 +516,9 @@ class CheckoutController extends Controller
             'discount' => round($discount, 2),
             'discounted_subtotal' => round($discountedSubtotal, 2),
             'gst_total' => round($gstTotal, 2),
+            'max_gst_percentage' => $maxGstPercentage,
             'shipping' => 0,
+            'shipping_gst' => 0,
             'grand_total' => round($grandTotal),
         ];
     }

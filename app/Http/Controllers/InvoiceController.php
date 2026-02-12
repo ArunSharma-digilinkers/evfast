@@ -20,6 +20,10 @@ class InvoiceController extends Controller
             return back()->with('error', 'Invoice not available for this order.');
         }
 
+        if (!in_array($order->status, ['dispatched', 'completed'])) {
+            return back()->with('error', 'Invoice is available only after the order has been dispatched.');
+        }
+
         $order->load('items.product', 'coupon');
 
         $pdf = Pdf::loadView('invoices.pdf', compact('order'));

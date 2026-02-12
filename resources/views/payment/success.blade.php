@@ -74,7 +74,7 @@
                 Continue Shopping
             </a>
             @auth
-                @if($order->invoice_number)
+                @if($order->invoice_number && in_array($order->status, ['dispatched', 'completed']))
                     <a href="{{ route('invoice.download', $order->id) }}" class="btn btn-outline-success">
                         <i class="fas fa-file-pdf me-1"></i> Download Invoice
                     </a>

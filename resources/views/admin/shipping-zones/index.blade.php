@@ -30,7 +30,7 @@
                                 <th width="50">#</th>
                                 <th>Zone Name</th>
                                 <th>States</th>
-                                <th>Rate</th>
+                                <th>Rate Multiplier</th>
                                 <th>Free Above</th>
                                 <th>Status</th>
                                 <th width="120">Action</th>
@@ -50,7 +50,7 @@
                                         @endforeach
                                     </td>
 
-                                    <td class="fw-semibold">{{ number_format($zone->rate) }}</td>
+                                    <td class="fw-semibold">{{ $zone->rate }}x</td>
 
                                     <td>
                                         @if ($zone->free_above)
