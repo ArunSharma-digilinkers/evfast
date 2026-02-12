@@ -2,54 +2,52 @@
 @section('content')
 
 <div class="main-wrapper">
-  <!-- Start Slider -->
-<div id="carouselExampleIndicators"
-     class="carousel slide"
-     data-bs-ride="carousel"
-     data-bs-interval="3000"
-     data-bs-pause="hover">
+    <!-- Start Slider -->
+    <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000"
+        data-bs-pause="hover">
 
-    <div class="carousel-indicators">
-        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active"></button>
-        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1"></button>
-        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2"></button>
-        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="3"></button>
-        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="4"></button>
-        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="5"></button>
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0"
+                class="active"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="3"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="4"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="5"></button>
+        </div>
+
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="{{ asset('img/portable-charger.jpg') }}" class="d-block w-100" alt="">
+            </div>
+            <div class="carousel-item">
+                <img src="{{ asset('img/wall-mount-ev-charger.jpg') }}" class="d-block w-100" alt="">
+            </div>
+            <div class="carousel-item">
+                <img src="{{ asset('img/ac-charger.jpg') }}" class="d-block w-100" alt="">
+            </div>
+            <div class="carousel-item">
+                <img src="{{ asset('img/EV-accessories.jpg') }}" class="d-block w-100" alt="">
+            </div>
+            <div class="carousel-item">
+                <img src="{{ asset('img/30-KW-DC-Charger.jpg') }}" class="d-block w-100" alt="">
+            </div>
+            <div class="carousel-item">
+                <img src="{{ asset('img/EV-Charging-Gun.jpg') }}" class="d-block w-100" alt="">
+            </div>
+        </div>
+
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators"
+            data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+        </button>
+
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators"
+            data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+        </button>
     </div>
-
-    <div class="carousel-inner">
-        <div class="carousel-item active">
-            <img src="{{ asset('img/portable-charger.jpg') }}" class="d-block w-100" alt="">
-        </div>
-        <div class="carousel-item">
-            <img src="{{ asset('img/wall-mount-ev-charger.jpg') }}" class="d-block w-100" alt="">
-        </div>
-        <div class="carousel-item">
-            <img src="{{ asset('img/ac-charger.jpg') }}" class="d-block w-100" alt="">
-        </div>
-        <div class="carousel-item">
-            <img src="{{ asset('img/EV-accessories.jpg') }}" class="d-block w-100" alt="">
-        </div>
-        <div class="carousel-item">
-            <img src="{{ asset('img/30-KW-DC-Charger.jpg') }}" class="d-block w-100" alt="">
-        </div>
-        <div class="carousel-item">
-            <img src="{{ asset('img/EV-Charging-Gun.jpg') }}" class="d-block w-100" alt="">
-        </div>
-    </div>
-
-    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon"></span>
-    </button>
-
-    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
-        <span class="carousel-control-next-icon"></span>
-    </button>
-</div>
-<!-- End Slider -->
-
-
+    <!-- End Slider -->
 
     <div class="hm-product-wrapper section-entry">
         <div class="container-fluid">
@@ -77,7 +75,7 @@
                         </div>
                     </a>
 
-                    <a href="{{ url('wall-mount-ev-chargers') }}">
+                    <a href="{{ url('popular-ac-charger') }}">
                         <div class="product-card">
                             <img src="{{ asset('img/product/wall-mount-ev-charger.jpg') }}" alt="">
                             <h4>Popular AC Charger</h4>
@@ -111,8 +109,8 @@
                             <h4>Accessories</h4>
                         </div>
                     </a>
-                </div>
 
+                </div>
             </div>
         </div>
     </div>
@@ -157,19 +155,17 @@
                     @endforeach
                 </div>
 
-
-
             </div>
         </div>
     </div>
-
 
     <section class="cta-section">
         <h2>Power the Future with Smart EV Charging</h2>
         <p class="text-white">Fast, reliable, and future-ready EV charging solutions for homes, businesses, and fleets.
         </p>
         <div class="cta-btns" data-aos="fade-up">
-            <a href="tel: +91-8595264742" class="btn-outline">Talk to an Expert</a>
+            <a href="tel: +91-8595264742" class="btn-outline"><i class="fa-solid fa-phone"></i> Talk to an Expert</a>
+            <a href="https://wa.me/918595264742" class="btn-outline" target="_blank"> <i class="fab fa-whatsapp"></i> Chat with Our Expert</a>
         </div>
     </section>
 
@@ -296,8 +292,6 @@
             </div>
         </div>
     </div>
-
-
 
 </div>
 

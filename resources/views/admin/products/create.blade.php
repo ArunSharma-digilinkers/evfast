@@ -85,16 +85,17 @@
 
                                 <!-- Price -->
                                 <div class="row">
+                                     <div class="col-md-6 mb-3">
+                                        <label class="form-label">Price (₹) <span class="text-danger">*</span></label>
+                                        <input type="number" name="price" class="form-control"
+                                            placeholder="Enter sale price" value="{{ old('price') }}" required>
+                                    </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">MRP (₹) <span class="text-danger">*</span></label>
                                         <input type="number" name="sale_price" class="form-control" placeholder="Enter MRP"
                                             value="{{ old('sale_price') }}" required>
                                     </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Price (₹) <span class="text-danger">*</span></label>
-                                        <input type="number" name="price" class="form-control"
-                                            placeholder="Enter sale price" value="{{ old('price') }}" required>
-                                    </div>
+                                   
 
                                     <div class="col-md-4 mb-3">
                                         <label class="form-label">GST Percentage (%)</label>
@@ -115,12 +116,19 @@
 
                                     <div class="col-md-4 mb-3">
                                         <label class="form-label">Shipping Type</label>
-                                        <select name="shipping_type" class="form-select">
+                                        <select name="shipping_type" class="form-select" id="shipping-type" onchange="toggleShippingRate()">
                                             <option value="free" {{ old('shipping_type') === 'free' ? 'selected' : '' }}>
                                                 Free Shipping</option>
                                             <option value="zone" {{ old('shipping_type') === 'zone' ? 'selected' : '' }}>
-                                                Zone-based Shipping</option>
+                                                Zone + Product Based Shipping</option>
                                         </select>
+                                    </div>
+
+                                    <div class="col-md-4 mb-3" id="shipping-rate-wrap" style="{{ old('shipping_type') === 'zone' ? '' : 'display:none;' }}">
+                                        <label class="form-label">Product Shipping Rate (&#8377;)</label>
+                                        <input type="number" name="shipping_rate" class="form-control" step="0.01"
+                                            min="0" value="{{ old('shipping_rate', 0) }}" placeholder="e.g. 150">
+                                        <small class="text-muted">Per-unit shipping charge for this product</small>
                                     </div>
 
                                     <!-- Add-on Products -->
@@ -198,4 +206,11 @@
 
         </div>
     </div>
+
+<script>
+function toggleShippingRate() {
+    let wrap = document.getElementById('shipping-rate-wrap');
+    wrap.style.display = document.getElementById('shipping-type').value === 'zone' ? '' : 'none';
+}
+</script>
 @endsection

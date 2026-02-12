@@ -12,15 +12,23 @@ class Order extends Model
             'email',
             'phone',
             'address',
-            'pincode',      
-            'state',      
-            'city',      
+            'pincode',
+            'state',
+            'city',
+            'gstin',
+            'shipping_name',
+            'shipping_phone',
+            'shipping_address',
+            'shipping_pincode',
+            'shipping_state',
+            'shipping_city',
             'total_amount',
             'coupon_id',
             'discount_amount',
             'subtotal',
             'gst_total',
             'shipping_amount',
+            'shipping_gst',
             'payment_method',
             'payment_status',
             'payment_id',
@@ -57,6 +65,11 @@ class Order extends Model
             : 1;
 
         return $prefix . '-' . $fyCode . '-' . str_pad($nextNum, 5, '0', STR_PAD_LEFT);
+    }
+
+    public function getHasSeparateShippingAttribute(): bool
+    {
+        return !empty($this->shipping_address);
     }
 
     public function items()
