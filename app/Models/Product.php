@@ -15,6 +15,7 @@ class Product extends Model
         'gst_percentage',
         'gst_type',
         'shipping_type',
+        'shipping_rate',
         'short_description',
         'technical_features',
         'warranty',

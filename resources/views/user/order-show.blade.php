@@ -37,6 +37,9 @@
                                     <th class="text-end">Base Price</th>
                                     <th class="text-end">GST</th>
                                     <th class="text-end">Total</th>
+                                    @if($order->items->contains(fn($i) => $i->serial_number))
+                                        <th>Serial No.</th>
+                                    @endif
                                 </tr>
                             </thead>
                             <tbody>
@@ -55,6 +58,9 @@
                                     <td class="text-end">₹{{ number_format($item->base_price * $item->quantity, 2) }}</td>
                                     <td class="text-end">₹{{ number_format($item->gst_amount, 2) }}</td>
                                     <td class="text-end fw-semibold">₹{{ number_format($item->total_price, 2) }}</td>
+                                    @if($order->items->contains(fn($i) => $i->serial_number))
+                                        <td>{{ $item->serial_number ?? '—' }}</td>
+                                    @endif
                                 </tr>
                                 @endforeach
                             </tbody>
@@ -78,13 +84,6 @@
                     </div>
                     @endif
 
-                    @if($order->gst_total > 0)
-                    <div class="d-flex justify-content-between mb-2">
-                        <span class="text-muted">GST</span>
-                        <span>+ ₹{{ number_format($order->gst_total, 2) }}</span>
-                    </div>
-                    @endif
-
                     <div class="d-flex justify-content-between mb-2">
                         <span class="text-muted">Shipping</span>
                         @if($order->shipping_amount > 0)
@@ -93,6 +92,18 @@
                             <span class="text-success">Free</span>
                         @endif
                     </div>
+
+                    @if($order->gst_total > 0)
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">
+                            GST
+                            @if($order->shipping_gst > 0)
+                                <small class="text-muted">(incl. shipping)</small>
+                            @endif
+                        </span>
+                        <span>+ ₹{{ number_format($order->gst_total, 2) }}</span>
+                    </div>
+                    @endif
 
                     <hr>
 
@@ -130,7 +141,7 @@
                         <div class="text-break" style="font-size: 13px;">{{ $order->payment_id }}</div>
                     </div>
 
-                    @if($order->invoice_number)
+                    @if($order->invoice_number && in_array($order->status, ['dispatched', 'completed']))
                     <div class="mt-3">
                         <a href="{{ route('invoice.download', $order->id) }}" class="btn btn-outline-success btn-sm w-100" style="border-radius: 50px;">
                             <i class="fas fa-file-pdf me-1"></i> Download Invoice
@@ -139,14 +150,31 @@
                     @endif
                 </div>
 
-                {{-- Delivery Address --}}
-                <div class="border rounded p-4">
-                    <h5 class="fw-bold mb-3">Delivery Address</h5>
+                {{-- Billing Address --}}
+                <div class="border rounded p-4 mb-4">
+                    <h5 class="fw-bold mb-3">Billing Address</h5>
 
                     <p class="mb-1 fw-semibold">{{ $order->name }}</p>
                     <p class="mb-1">{{ $order->address }}</p>
                     <p class="mb-1">{{ $order->city }}, {{ $order->state }} - {{ $order->pincode }}</p>
                     <p class="mb-0">Phone: {{ $order->phone }}</p>
+                    @if($order->gstin)
+                        <p class="mb-0 mt-2"><strong>GSTIN:</strong> {{ $order->gstin }}</p>
+                    @endif
+                </div>
+
+                {{-- Shipping Address --}}
+                <div class="border rounded p-4">
+                    <h5 class="fw-bold mb-3">Shipping Address</h5>
+
+                    @if($order->has_separate_shipping)
+                        <p class="mb-1 fw-semibold">{{ $order->shipping_name }}</p>
+                        <p class="mb-1">{{ $order->shipping_address }}</p>
+                        <p class="mb-1">{{ $order->shipping_city }}, {{ $order->shipping_state }} - {{ $order->shipping_pincode }}</p>
+                        <p class="mb-0">Phone: {{ $order->shipping_phone }}</p>
+                    @else
+                        <p class="mb-0 text-muted">Same as billing address</p>
+                    @endif
                 </div>
 
             </div>

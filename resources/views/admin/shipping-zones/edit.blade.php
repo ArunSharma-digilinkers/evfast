@@ -41,9 +41,10 @@
                             </div>
 
                             <div class="col-md-6">
-                                <label class="form-label">Shipping Rate (₹) *</label>
+                                <label class="form-label">Rate Multiplier *</label>
                                 <input type="number" name="rate" class="form-control" step="0.01" min="0"
-                                    value="{{ old('rate', $shipping_zone->rate) }}" required>
+                                    value="{{ old('rate', $shipping_zone->rate) }}" required placeholder="e.g. 1.2">
+                                <small class="text-muted">1 = base rate, 1.2 = 20% extra, 1.5 = 50% extra</small>
                             </div>
 
                             <div class="col-md-6">
