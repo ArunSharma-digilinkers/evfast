@@ -45,6 +45,34 @@ function removeAddon(id, el) {
 }
 
 
+document.addEventListener("DOMContentLoaded", function () {
+
+    const text = document.getElementById("productDescription");
+    const button = document.getElementById("readMoreBtn");
+
+    if (text) {
+        const lineHeight = parseFloat(getComputedStyle(text).lineHeight);
+        const maxHeight = lineHeight * 3;
+
+        if (text.scrollHeight > maxHeight) {
+            button.classList.remove("d-none");
+        }
+    }
+
+});
+
+function toggleDescription(button) {
+    const text = document.getElementById("productDescription");
+
+    text.classList.toggle("expanded");
+
+    if (text.classList.contains("expanded")) {
+        button.innerText = "Read Less";
+    } else {
+        button.innerText = "Read More";
+    }
+}
+
 
 $(document).ready(function () {
     $('.testimonial-carousel').owlCarousel({

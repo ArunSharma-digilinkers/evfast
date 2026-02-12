@@ -44,10 +44,11 @@
         <p class="text-white">Fast, reliable, and future-ready EV charging solutions for homes, businesses, and fleets.
         </p>
         <div class="cta-btns">
-            <a href="tel:+91-8595264742" class="btn-outline">Talk to an Expert</a>
+             <a href="tel: +91-8595264742" class="btn-outline"><i class="fa-solid fa-phone"></i> Talk to an Expert</a>
+            <a href="https://wa.me/918595264742" class="btn-outline" target="_blank">  <i class="fab fa-whatsapp"></i> Chat with Our Expert</a>
         </div>
     </section>
-      <div class="why-us section-entry">
+    <div class="why-us section-entry">
         <div class="container">
 
             <div class="section-heading text-center">
