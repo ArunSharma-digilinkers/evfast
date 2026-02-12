@@ -16,5 +16,10 @@
 <script src="{{ asset('js/main.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
 
+<<<<<<< HEAD
+=======
+@yield('scripts')
+
+>>>>>>> 7267eb2c414b24011a543ca29ad7a0d597b749ce
 </body>
 </html>

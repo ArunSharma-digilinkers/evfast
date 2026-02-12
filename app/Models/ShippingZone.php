@@ -21,8 +21,27 @@ class ShippingZone extends Model
         'status' => 'boolean',
     ];
 
-    public static function getShippingCost(string $state, float $subtotal, bool $hasZoneProduct): array
+    /**
+     * Calculate shipping cost: sum(product.shipping_rate * qty) * zone.rate (multiplier).
+     *
+     * Zone rate acts as a multiplier: 1 = base rate, 1.2 = 20% extra, etc.
+     *
+     * @param string $state       Customer's state
+     * @param float  $subtotal    Order subtotal (for free_above check)
+     * @param array  $cartProducts Array of ['product' => Product, 'quantity' => int]
+     */
+    public static function getShippingCost(string $state, float $subtotal, array $cartProducts): array
     {
+        $hasZoneProduct = false;
+        $productShipping = 0;
+
+        foreach ($cartProducts as $cp) {
+            if ($cp['product']->shipping_type === 'zone') {
+                $hasZoneProduct = true;
+                $productShipping += $cp['product']->shipping_rate * $cp['quantity'];
+            }
+        }
+
         if (!$hasZoneProduct) {
             return ['shipping' => 0, 'free' => true];
         }
@@ -39,6 +58,8 @@ class ShippingZone extends Model
             return ['shipping' => 0, 'free' => true];
         }
 
-        return ['shipping' => (float) $zone->rate, 'free' => false];
+        $totalShipping = round($productShipping * (float) $zone->rate, 2);
+
+        return ['shipping' => $totalShipping, 'free' => false];
     }
 }
