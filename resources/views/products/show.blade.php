@@ -70,7 +70,12 @@
                         @else
                             Price inclusive of all taxes
                         @endif
-                        <br>Free Shipping
+                        <br>
+                        @if($product->shipping_type === 'free')
+                            Free Shipping
+                        @else
+                            Shipping charges extra
+                        @endif
                     </p>
 
                     {{-- FEATURES (CKEDITOR CONTENT) --}}

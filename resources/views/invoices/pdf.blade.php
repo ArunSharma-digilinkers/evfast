@@ -107,21 +107,43 @@
             </div>
         </div>
 
-        {{-- Bill To --}}
-        <div class="bill-to">
-            <div class="bill-to-title">Bill To</div>
-            <strong>{{ $order->name }}</strong><br>
-            {{ $order->email }} | {{ $order->phone }}<br>
-            {{ $order->address }}<br>
-            {{ $order->city }}, {{ $order->state }} - {{ $order->pincode }}
+        {{-- Bill To / Ship To --}}
+        <div style="display: table; width: 100%; margin-bottom: 25px;">
+            <div style="display: table-cell; width: {{ $order->has_separate_shipping ? '50%' : '100%' }}; vertical-align: top;">
+                <div class="bill-to" style="margin-bottom: 0; {{ $order->has_separate_shipping ? 'margin-right: 10px;' : '' }}">
+                    <div class="bill-to-title">Bill To</div>
+                    <strong>{{ $order->name }}</strong><br>
+                    {{ $order->email }} | {{ $order->phone }}<br>
+                    {{ $order->address }}<br>
+                    {{ $order->city }}, {{ $order->state }} - {{ $order->pincode }}
+                    @if($order->gstin)
+                        <br><strong>GSTIN:</strong> {{ $order->gstin }}
+                    @endif
+                </div>
+            </div>
+            @if($order->has_separate_shipping)
+            <div style="display: table-cell; width: 50%; vertical-align: top;">
+                <div class="bill-to" style="margin-bottom: 0; margin-left: 10px;">
+                    <div class="bill-to-title">Ship To</div>
+                    <strong>{{ $order->shipping_name }}</strong><br>
+                    {{ $order->shipping_phone }}<br>
+                    {{ $order->shipping_address }}<br>
+                    {{ $order->shipping_city }}, {{ $order->shipping_state }} - {{ $order->shipping_pincode }}
+                </div>
+            </div>
+            @endif
         </div>
 
         {{-- Items Table --}}
+        @php $hasSerials = $order->items->contains(fn($i) => $i->serial_number); @endphp
         <table class="items-table">
             <thead>
                 <tr>
                     <th>#</th>
                     <th>Product</th>
+                    @if($hasSerials)
+                        <th>Serial No.</th>
+                    @endif
                     <th class="text-center">Qty</th>
                     <th class="text-right">Base Price</th>
                     <th class="text-center">GST %</th>
@@ -134,6 +156,9 @@
                 <tr>
                     <td>{{ $index + 1 }}</td>
                     <td>{{ $item->product->name ?? 'Product' }}</td>
+                    @if($hasSerials)
+                        <td>{{ $item->serial_number ?? '—' }}</td>
+                    @endif
                     <td class="text-center">{{ $item->quantity }}</td>
                     <td class="text-right">{{ number_format($item->base_price * $item->quantity, 2) }}</td>
                     <td class="text-center">{{ $item->gst_percentage }}%</td>
@@ -165,13 +190,6 @@
                 </div>
                 @endif
 
-                @if($order->gst_total > 0)
-                <div class="summary-row">
-                    <div class="summary-label">GST</div>
-                    <div class="summary-value">+ {{ number_format($order->gst_total, 2) }}</div>
-                </div>
-                @endif
-
                 <div class="summary-row">
                     <div class="summary-label">Shipping</div>
                     <div class="summary-value">
@@ -182,6 +200,18 @@
                         @endif
                     </div>
                 </div>
+
+                @if($order->gst_total > 0)
+                <div class="summary-row">
+                    <div class="summary-label">
+                        GST
+                        @if($order->shipping_gst > 0)
+                            (incl. shipping GST {{ number_format($order->shipping_gst, 2) }})
+                        @endif
+                    </div>
+                    <div class="summary-value">+ {{ number_format($order->gst_total, 2) }}</div>
+                </div>
+                @endif
 
                 <div class="summary-row summary-total">
                     <div class="summary-label">Grand Total</div>

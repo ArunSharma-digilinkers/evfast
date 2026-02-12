@@ -16,7 +16,7 @@
 <script src="{{ asset('js/main.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
 
-
+@yield('scripts')
 
 </body>
 </html>

@@ -105,6 +105,92 @@
                             <textarea name="address" rows="3" class="form-control" required>{{ old('address') }}</textarea>
                         </div>
 
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">GSTIN <small class="text-muted">(Optional)</small></label>
+                            <input type="text" name="gstin" class="form-control" maxlength="15"
+                                   value="{{ old('gstin', $userGstin) }}"
+                                   placeholder="e.g. 22AAAAA0000A1Z5" style="text-transform: uppercase;">
+                            @error('gstin')
+                                <div class="text-danger small mt-1">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                    </div>
+
+                    {{-- Ship to Different Address --}}
+                    <div class="mt-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="ship-to-different" name="ship_to_different" value="1"
+                                   {{ old('ship_to_different') ? 'checked' : '' }}
+                                   onchange="toggleShippingForm()">
+                            <label class="form-check-label fw-semibold" for="ship-to-different">
+                                Ship to a different address
+                            </label>
+                        </div>
+
+                        <div id="shipping-form" class="mt-4" style="{{ old('ship_to_different') ? '' : 'display: none;' }}">
+
+                            <h6 class="fw-bold mb-3">Shipping Address</h6>
+
+                            {{-- Saved Address Selector for Shipping --}}
+                            @auth
+                                @if($addresses->count())
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold text-muted mb-2 small">Use a saved address for shipping:</label>
+                                        <div class="row g-2">
+                                            @foreach($addresses as $addr)
+                                            <div class="col-md-6">
+                                                <div class="border rounded p-2 shipping-address-card small"
+                                                     style="cursor: pointer; transition: all 0.2s;"
+                                                     onclick="fillShippingAddress({{ $addr->id }}, this)">
+                                                    <span class="badge bg-secondary mb-1" style="font-size: 9px;">{{ $addr->label }}</span>
+                                                    <p class="fw-semibold mb-0" style="font-size: 12px;">{{ $addr->name }}</p>
+                                                    <p class="mb-0 text-muted" style="font-size: 11px;">{{ Str::limit($addr->address, 40) }}</p>
+                                                </div>
+                                            </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endif
+                            @endauth
+
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Full Name *</label>
+                                    <input type="text" name="shipping_name" class="form-control" value="{{ old('shipping_name') }}">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Mobile Number *</label>
+                                    <input type="text" name="shipping_phone" class="form-control" maxlength="10" value="{{ old('shipping_phone') }}">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Pincode *</label>
+                                    <input type="text" name="shipping_pincode" class="form-control" maxlength="6" value="{{ old('shipping_pincode') }}">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">State *</label>
+                                    <select name="shipping_state" id="shipping-state-select" class="form-select" onchange="updateShipping()">
+                                        <option value="">Select State</option>
+                                        @foreach(\App\Http\Controllers\Admin\ShippingZoneController::indianStates() as $state)
+                                            <option value="{{ $state }}" {{ old('shipping_state') === $state ? 'selected' : '' }}>{{ $state }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">City *</label>
+                                    <input type="text" name="shipping_city" class="form-control" value="{{ old('shipping_city') }}">
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label fw-semibold">Full Address *</label>
+                                    <textarea name="shipping_address" rows="3" class="form-control">{{ old('shipping_address') }}</textarea>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     {{-- Razorpay Hidden Fields --}}
@@ -145,14 +231,14 @@
                         <span id="discount-display">- ₹{{ number_format($summary['discount'], 2) }}</span>
                     </div>
 
-                    <div class="d-flex justify-content-between mb-2" id="gst-row" style="{{ $summary['gst_total'] > 0 ? '' : 'display:none;' }}">
-                        <span class="text-muted">GST</span>
-                        <span id="gst-display">+ ₹{{ number_format($summary['gst_total'], 2) }}</span>
-                    </div>
-
                     <div class="d-flex justify-content-between mb-2">
                         <span class="text-muted">Shipping</span>
                         <span id="shipping-display" class="text-muted">Select state</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-2" id="gst-row" style="{{ $summary['gst_total'] > 0 ? '' : 'display:none;' }}">
+                        <span class="text-muted">GST</span>
+                        <span id="gst-display">+ ₹{{ number_format($summary['gst_total'], 2) }}</span>
                     </div>
 
                     <div id="roundoff-row" class="d-flex justify-content-between mb-2" style="display: none !important;">
@@ -226,17 +312,28 @@
 // Base totals from server (without shipping)
 let baseSubtotal = {{ $summary['subtotal'] }};
 let baseDiscount = {{ $summary['discount'] }};
-let baseGst = {{ $summary['gst_total'] }};
+let baseProductGst = {{ $summary['gst_total'] }};
 let currentShipping = 0;
+let currentShippingGst = 0;
 let shippingResolved = false;
 
+function toggleShippingForm() {
+    let checked = document.getElementById('ship-to-different').checked;
+    document.getElementById('shipping-form').style.display = checked ? '' : 'none';
+    updateShipping();
+}
+
 function updateShipping() {
-    let state = document.getElementById('state-select').value;
+    let shipDifferent = document.getElementById('ship-to-different').checked;
+    let state = shipDifferent
+        ? document.getElementById('shipping-state-select').value
+        : document.getElementById('state-select').value;
     let shippingEl = document.getElementById('shipping-display');
 
     if (!state) {
         shippingEl.innerHTML = '<span class="text-muted">Select state</span>';
         shippingResolved = false;
+        currentShippingGst = 0;
         recalcTotal(0);
         return;
     }
@@ -251,14 +348,17 @@ function updateShipping() {
         if (data.error) {
             shippingEl.innerHTML = '<span class="text-danger">' + data.error + '</span>';
             shippingResolved = false;
+            currentShippingGst = 0;
             recalcTotal(0);
             return;
         }
 
         shippingResolved = true;
+        currentShippingGst = data.shipping_gst || 0;
 
         if (data.free || data.shipping == 0) {
             shippingEl.innerHTML = '<span class="text-success">Free</span>';
+            currentShippingGst = 0;
             recalcTotal(0);
         } else {
             shippingEl.innerHTML = '₹' + Number(data.shipping).toLocaleString('en-IN');
@@ -268,12 +368,26 @@ function updateShipping() {
     .catch(() => {
         shippingEl.innerHTML = '<span class="text-danger">Error</span>';
         shippingResolved = false;
+        currentShippingGst = 0;
     });
 }
 
 function recalcTotal(shipping) {
     currentShipping = shipping;
-    let exactTotal = (baseSubtotal - baseDiscount) + baseGst + shipping;
+
+    // Consolidated GST = product GST + shipping GST
+    let consolidatedGst = baseProductGst + currentShippingGst;
+
+    // Update GST display (consolidated)
+    let gstRow = document.getElementById('gst-row');
+    if (consolidatedGst > 0) {
+        gstRow.style.display = '';
+        document.getElementById('gst-display').textContent = '+ ₹' + consolidatedGst.toFixed(2);
+    } else {
+        gstRow.style.display = 'none';
+    }
+
+    let exactTotal = (baseSubtotal - baseDiscount) + consolidatedGst + shipping;
     let roundedTotal = Math.round(exactTotal);
     let roundOff = roundedTotal - exactTotal;
 
@@ -307,12 +421,27 @@ function payWithRazorpay() {
         return;
     }
 
+    let shipDifferent = document.getElementById('ship-to-different').checked;
+    if (shipDifferent) {
+        let sName = form.querySelector('[name="shipping_name"]').value;
+        let sPhone = form.querySelector('[name="shipping_phone"]').value;
+        let sState = form.querySelector('[name="shipping_state"]').value;
+        let sCity = form.querySelector('[name="shipping_city"]').value;
+        let sAddress = form.querySelector('[name="shipping_address"]').value;
+
+        if (!sName || !sPhone || !sState || !sCity || !sAddress) {
+            alert('Please fill all shipping address details.');
+            return;
+        }
+    }
+
     if (!shippingResolved) {
         alert('Please select a state to calculate shipping.');
         return;
     }
 
-    let exactTotal = (baseSubtotal - baseDiscount) + baseGst + currentShipping;
+    let consolidatedGst = baseProductGst + currentShippingGst;
+    let exactTotal = (baseSubtotal - baseDiscount) + consolidatedGst + currentShipping;
     let finalAmount = Math.round(exactTotal);
 
     let options = {
@@ -362,9 +491,17 @@ function payWithRazorpay() {
 
 // Auto-trigger if state was pre-selected (e.g. from old() after validation error)
 document.addEventListener('DOMContentLoaded', function() {
-    let stateSelect = document.getElementById('state-select');
-    if (stateSelect.value) {
-        updateShipping();
+    let shipDifferent = document.getElementById('ship-to-different').checked;
+    if (shipDifferent) {
+        let shippingState = document.getElementById('shipping-state-select');
+        if (shippingState.value) {
+            updateShipping();
+        }
+    } else {
+        let stateSelect = document.getElementById('state-select');
+        if (stateSelect.value) {
+            updateShipping();
+        }
     }
 });
 
@@ -390,6 +527,35 @@ function fillAddress(addressId, el) {
 
         // Highlight selected card
         document.querySelectorAll('.address-card').forEach(c => c.classList.remove('border-success'));
+        el.classList.add('border-success');
+    })
+    .catch(() => {
+        alert('Could not load address. Please try again.');
+    });
+}
+
+function fillShippingAddress(addressId, el) {
+    fetch('/checkout/address/' + addressId, {
+        headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(res => {
+        if (!res.ok) throw new Error('Failed');
+        return res.json();
+    })
+    .then(data => {
+        let form = document.getElementById('checkout-form');
+        form.querySelector('[name="shipping_name"]').value = data.name;
+        form.querySelector('[name="shipping_phone"]').value = data.phone;
+        form.querySelector('[name="shipping_pincode"]').value = data.pincode;
+        form.querySelector('[name="shipping_city"]').value = data.city;
+        form.querySelector('[name="shipping_address"]').value = data.address;
+
+        let shippingStateSelect = form.querySelector('[name="shipping_state"]');
+        shippingStateSelect.value = data.state;
+        updateShipping();
+
+        // Highlight selected card
+        document.querySelectorAll('.shipping-address-card').forEach(c => c.classList.remove('border-success'));
         el.classList.add('border-success');
     })
     .catch(() => {
@@ -478,7 +644,7 @@ function removeCoupon() {
 function updateSummaryFromServer(summary, couponCode) {
     baseSubtotal = summary.subtotal;
     baseDiscount = summary.discount;
-    baseGst = summary.gst_total;
+    baseProductGst = summary.gst_total;
 
     // Update discount row - only show when coupon is applied and discount > 0
     let discountRow = document.getElementById('discount-row');
@@ -493,22 +659,14 @@ function updateSummaryFromServer(summary, couponCode) {
     // Update subtotal display
     document.getElementById('subtotal-display').textContent = '₹' + Number(summary.subtotal).toFixed(2);
 
-    // Update GST display
-    let gstRow = document.getElementById('gst-row');
-    if (summary.gst_total > 0) {
-        gstRow.style.display = '';
-        document.getElementById('gst-display').textContent = '+ ₹' + Number(summary.gst_total).toFixed(2);
-    } else {
-        gstRow.style.display = 'none';
-    }
-
-    // Recalc total with current shipping
+    // Recalc total with current shipping (this also updates consolidated GST display)
     recalcTotal(currentShipping);
 }
 </script>
 
 <style>
-.address-card:hover {
+.address-card:hover,
+.shipping-address-card:hover {
     border-color: #0f9b0f !important;
     box-shadow: 0 2px 8px rgba(15, 155, 15, 0.15);
 }
