@@ -111,7 +111,7 @@
             @else
                 {{-- Empty Cart --}}
                 <div class="text-center py-5">
-                    <i class="fas fa-shopping-cart fa-4x text-muted mb-3 d-block"></i>
+                    <i class="fas fa-shopping-cart fa-4x text-muted mb-3 d-block text-center" style="display: inline-block; width: auto;"></i>
                     <h3 class="fw-bold mb-2">Your cart is empty</h3>
                     <p class="text-muted mb-4">Looks like you haven't added anything yet.</p>
                     <a href="{{ url('/') }}" class="btn-submit" style="display: inline-block; width: auto;">

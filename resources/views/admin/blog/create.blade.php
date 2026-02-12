@@ -31,7 +31,11 @@
                             {{-- Blog Content --}}
                             <div class="col-12">
                                 <label class="form-label fw-semibold">Blog Content *</label>
-                                <textarea name="blog_post" class="form-control ckeditor" rows="6" required></textarea>
+                                  <div class="mb-3">
+                                    <label class="form-label">Technical Features</label>
+                                    <textarea name="blog_post" class="form-control ckeditor" rows="4"></textarea>
+                                </div>
+                               
                             </div>
 
                             {{-- SEO Title --}}
