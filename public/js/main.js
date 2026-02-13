@@ -18,7 +18,7 @@
             });
     });
 
-    let removedImages = [];
+let removedImages = [];
 
 function removeImage(imageName, index) {
 

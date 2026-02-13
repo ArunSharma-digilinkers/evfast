@@ -96,13 +96,17 @@
                                             value="{{ old('sale_price') }}" required>
                                     </div>
                                    
+                                    <div class="col-md-3 mb-3">
+                                        <label class="form-label">HSN Code</label>
+                                        <input type="number" name="hsn_code" class="form-control" value="{{ old('hsn_code') }}" placeholder="HSN Code">
+                                    </div>
 
-                                    <div class="col-md-4 mb-3">
+                                    <div class="col-md-3 mb-3">
                                         <label class="form-label">GST Percentage (%)</label>
                                         <input type="number" name="gst_percentage" class="form-control" step="0.01"
                                             min="0" value="{{ old('gst_percentage', 0) }}" placeholder="e.g. 18">
                                     </div>
-                                    <div class="col-md-4 mb-3">
+                                    <div class="col-md-3 mb-3">
                                         <label class="form-label">GST Type</label>
                                         <select name="gst_type" class="form-select">
                                             <option value="inclusive"
@@ -114,7 +118,7 @@
                                         </select>
                                     </div>
 
-                                    <div class="col-md-4 mb-3">
+                                    <div class="col-md-3 mb-3">
                                         <label class="form-label">Shipping Type</label>
                                         <select name="shipping_type" class="form-select" id="shipping-type" onchange="toggleShippingRate()">
                                             <option value="free" {{ old('shipping_type') === 'free' ? 'selected' : '' }}>

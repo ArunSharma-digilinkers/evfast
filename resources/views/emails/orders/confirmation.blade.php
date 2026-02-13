@@ -1,124 +1,201 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background: #f4f4f4; }
-        .container { max-width: 600px; margin: 20px auto; background: #fff; border-radius: 8px; overflow: hidden; }
-        .header { background: #0f9b0f; padding: 30px; text-align: center; }
-        .header h1 { color: #fff; margin: 0; font-size: 24px; }
-        .header p { color: rgba(255,255,255,0.9); margin: 5px 0 0; }
-        .body { padding: 30px; }
-        .order-id { background: #f0faf0; border: 1px solid #0f9b0f; border-radius: 6px; padding: 15px; text-align: center; margin-bottom: 25px; }
-        .order-id span { font-size: 20px; font-weight: bold; color: #0f9b0f; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        th { background: #f8f9fa; text-align: left; padding: 10px; border-bottom: 2px solid #dee2e6; font-size: 14px; }
-        td { padding: 10px; border-bottom: 1px solid #eee; font-size: 14px; }
-        .summary-row { display: flex; justify-content: space-between; padding: 6px 0; }
-        .summary-label { color: #666; }
-        .total-row { border-top: 2px solid #0f9b0f; padding-top: 10px; margin-top: 5px; font-size: 18px; font-weight: bold; }
-        .address-box { background: #f8f9fa; border-radius: 6px; padding: 15px; margin-top: 20px; }
-        .footer { background: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #999; }
-    </style>
+<meta charset="utf-8">
+<style>
+body {
+    font-family: DejaVu Sans, sans-serif;
+    font-size: 12px;
+}
+
+.container {
+    width: 100%;
+    border: 2px solid #000;
+    padding: 10px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #000;
+    padding: 6px;
+}
+
+.no-border td {
+    border: none !important;
+}
+
+.center { text-align: center; }
+.right { text-align: right; }
+.bold { font-weight: bold; }
+
+.title {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.logo {
+    height: 60px;
+}
+
+.header-table td {
+    vertical-align: top;
+}
+</style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Order Confirmed!</h1>
-            <p>Thank you for shopping with EVFast</p>
-        </div>
 
-        <div class="body">
-            <p>Hi {{ $order->name }},</p>
-            <p>Your order has been placed successfully. Here are the details:</p>
+<div class="container">
 
-            <div class="order-id">
-                Order <span>#{{ $order->id }}</span>
-            </div>
+    <!-- HEADER -->
+    <table class="no-border header-table">
+        <tr>
+            <td width="20%">
+                <img src="https://ev-fast.com/img/white-logo.png" class="logo">
+            </td>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th>Product</th>
-                        <th style="text-align:center">Qty</th>
-                        <th style="text-align:right">Amount</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($order->items as $item)
-                    <tr>
-                        <td>{{ $item->product->name ?? 'Product' }}</td>
-                        <td style="text-align:center">{{ $item->quantity }}</td>
-                        <td style="text-align:right">{{ number_format($item->total_price, 2) }}</td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
+            <td width="55%">
+                <b>Advance Ev Charging Solutions</b><br>
+                Regd.Add:- C-68, First Floor,<br>
+                Mangolpuri Industrial Area, Phase - I<br>
+                Delhi - 110083<br>
+                GSTIN/UIN: 07ABPFA6419B1ZK<br>
+                State Name : Delhi, Code : 07
+            </td>
 
-            <div style="text-align: right;">
-                <div class="summary-row">
-                    <span class="summary-label">Subtotal:</span>
-                    <span>{{ number_format($order->subtotal, 2) }}</span>
-                </div>
+            <td width="25%" class="right">
+                <div class="title">TAX INVOICE</div>
+                Invoice No: {{ $order->invoice_number ?? 'INV-'.$order->id }}<br>
+                Date: {{ date('d-m-Y', strtotime($order->created_at)) }}
+            </td>
+        </tr>
+    </table>
 
-                @if($order->discount_amount > 0)
-                <div class="summary-row" style="color: #0f9b0f;">
-                    <span>Discount:</span>
-                    <span>- {{ number_format($order->discount_amount, 2) }}</span>
-                </div>
-                @endif
+    <br>
 
-                @if($order->gst_total > 0)
-                <div class="summary-row">
-                    <span class="summary-label">GST:</span>
-                    <span>+ {{ number_format($order->gst_total, 2) }}</span>
-                </div>
-                @endif
-
-                @if($order->shipping_amount > 0)
-                <div class="summary-row">
-                    <span class="summary-label">Shipping:</span>
-                    <span>{{ number_format($order->shipping_amount, 2) }}</span>
-                </div>
-                @else
-                <div class="summary-row">
-                    <span class="summary-label">Shipping:</span>
-                    <span style="color: #0f9b0f;">Free</span>
-                </div>
-                @endif
-
-                <div class="total-row">
-                    Total: &#8377;{{ number_format($order->total_amount) }}
-                </div>
-            </div>
-
-            <div class="address-box">
-                <strong>Billing Address:</strong><br>
+    <!-- BILLING & SHIPPING -->
+    <table>
+        <tr class="bold">
+            <th width="50%">Bill To</th>
+            <th width="50%">Ship To</th>
+        </tr>
+        <tr>
+            <td>
                 {{ $order->name }}<br>
                 {{ $order->address }}<br>
-                {{ $order->city }}, {{ $order->state }} - {{ $order->pincode }}<br>
-                Phone: {{ $order->phone }}
+                {{ $order->city }} - {{ $order->pincode }}<br>
+                State: {{ $order->state }}<br>
+                Phone: {{ $order->phone }}<br>
                 @if($order->gstin)
-                    <br>GSTIN: {{ $order->gstin }}
+                GSTIN: {{ $order->gstin }}
                 @endif
-            </div>
+            </td>
 
-            @if($order->has_separate_shipping)
-            <div class="address-box" style="margin-top: 10px;">
-                <strong>Shipping Address:</strong><br>
-                {{ $order->shipping_name }}<br>
-                {{ $order->shipping_address }}<br>
-                {{ $order->shipping_city }}, {{ $order->shipping_state }} - {{ $order->shipping_pincode }}<br>
-                Phone: {{ $order->shipping_phone }}
-            </div>
-            @endif
+            <td>
+                {{ $order->shipping_name ?? $order->name }}<br>
+                {{ $order->shipping_address ?? $order->address }}<br>
+                {{ $order->shipping_city ?? $order->city }} - {{ $order->shipping_pincode ?? $order->pincode }}<br>
+                State: {{ $order->shipping_state ?? $order->state }}<br>
+                Phone: {{ $order->shipping_phone ?? $order->phone }}
+            </td>
+        </tr>
+    </table>
 
-            <p style="margin-top: 20px;">Payment ID: <strong>{{ $order->payment_id }}</strong></p>
-        </div>
+    <br>
 
-        <div class="footer">
-            <p>&copy; {{ date('Y') }} EVFast. All rights reserved.</p>
-        </div>
-    </div>
+    <!-- PRODUCT TABLE -->
+    <table>
+        <thead>
+        <tr class="bold center">
+            <th>#</th>
+            <th>Description</th>
+            <th>HSN</th>
+            <th>Qty</th>
+            <th>Rate</th>
+            <th>Taxable</th>
+            <th>GST %</th>
+            <th>Total</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        @foreach($order->items as $index => $item)
+        <tr>
+            <td class="center">{{ $index + 1 }}</td>
+            <td>{{ $item->product->name }}</td>
+            <td class="center">{{ $item->product->hsn_code }}</td>
+            <td class="center">{{ $item->quantity }}</td>
+            <td class="right">{{ number_format($item->price,2) }}</td>
+            <td class="right">{{ number_format($item->price * $item->quantity,2) }}</td>
+            <td class="center">{{ $item->product->gst_percentage }}%</td>
+            <td class="right">{{ number_format($item->total_price,2) }}</td>
+        </tr>
+        @endforeach
+        </tbody>
+    </table>
+
+    <br>
+
+    @php
+        $cgst = $order->gst_total / 2;
+        $sgst = $order->gst_total / 2;
+    @endphp
+
+    <!-- TOTAL SECTION -->
+    <table>
+        <tr>
+            <td width="65%" class="no-border"></td>
+            <td width="35%">
+                <table>
+                    <tr>
+                        <td>Subtotal</td>
+                        <td class="right">{{ number_format($order->subtotal,2) }}</td>
+                    </tr>
+                    <tr>
+                        <td>CGST</td>
+                        <td class="right">{{ number_format($cgst,2) }}</td>
+                    </tr>
+                    <tr>
+                        <td>SGST</td>
+                        <td class="right">{{ number_format($sgst,2) }}</td>
+                    </tr>
+                    <tr>
+                        <td>Shipping</td>
+                        <td class="right">{{ number_format($order->shipping_amount,2) }}</td>
+                    </tr>
+                    <tr class="bold">
+                        <td>Total</td>
+                        <td class="right">₹ {{ number_format($order->total_amount,2) }}</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+    <!-- FOOTER -->
+    <table class="no-border">
+        <tr>
+            <td width="60%">
+                <b>Declaration:</b><br>
+                1. Goods once sold will not be taken back.<br>
+                2. Subject to Delhi jurisdiction.
+            </td>
+
+            <td width="40%" class="right">
+                For Advance Ev Charging Solutions<br><br><br>
+                Authorised Signatory
+            </td>
+        </tr>
+    </table>
+
+</div>
+
 </body>
 </html>

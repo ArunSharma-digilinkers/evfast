@@ -42,32 +42,6 @@
                 <span>₹{{ number_format($order->total_amount) }}</span>
             </div>
         </div>
-
-        <!-- Customer Details -->
-        <div class="info-box">
-            <h5 class="fw-bold mb-3">Customer Details</h5>
-
-            <div class="info-row">
-                <span>Name</span>
-                <span>{{ $order->name }}</span>
-            </div>
-
-            <div class="info-row">
-                <span>Email</span>
-                <span>{{ $order->email }}</span>
-            </div>
-
-            <div class="info-row">
-                <span>Phone</span>
-                <span>{{ $order->phone }}</span>
-            </div>
-
-            <div class="info-row">
-                <span>Address</span>
-                <span>{{ $order->address }}</span>
-            </div>
-        </div>
-
         <!-- Buttons -->
         <div class="action-buttons">
             <a href="{{ url('/') }}" class="btn btn-submit">

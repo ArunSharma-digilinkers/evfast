@@ -24,7 +24,8 @@ class Product extends Model
         'description',
         'status',
         'image',
-        'images'
+        'images',
+        'hsn_code'
     ];
 
     // ✅ THIS IS REQUIRED

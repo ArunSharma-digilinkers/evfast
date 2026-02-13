@@ -88,6 +88,7 @@ public function create()
             'status'               => $request->status ?? 1,
             'image'                => $mainImage,
             'images'               => $gallery,
+            'hsn_code'               => $request->hsn_code,
         ]);
 
         /* ---------- ATTACH ADD-ONS ---------- */
@@ -143,6 +144,7 @@ public function update(Request $request, Product $product)
         'quantity'           => $request->quantity,
         'description'        => $request->description,
         'status'             => $request->status,
+        'hsn_code'             => $request->hsn_code,
     ];
 
     /* ===============================

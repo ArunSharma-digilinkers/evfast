@@ -41,7 +41,7 @@
                             @method('PUT')
 
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <!-- Category -->
                                     <div class="mb-3">
                                         <label class="form-label">Category <span class="text-danger">*</span></label>
@@ -55,12 +55,23 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <!-- Product Name -->
                                     <div class="mb-3">
                                         <label class="form-label">Product Name <span
                                                 class="text-danger">*</span></label>
                                         <input type="text" name="name" value="{{ old('name', $product->name) }}"
+                                            class="form-control" required>
+                                    </div>
+
+                                </div>
+
+                                 <div class="col-md-4">
+                                    <!-- Product Name -->
+                                    <div class="mb-3">
+                                        <label class="form-label">HSN Code <span
+                                                class="text-danger"></span></label>
+                                        <input type="number" name="hsn_code" value="{{ old('hsn_code', $product->hsn_code) }}"
                                             class="form-control" required>
                                     </div>
 
