@@ -18,6 +18,26 @@
             });
     });
 
+    let removedImages = [];
+
+function removeImage(imageName, index) {
+
+    if (confirm('Are you sure you want to remove this image?')) {
+
+        removedImages.push(imageName);
+
+        document.getElementById('removed_images').value = removedImages.join(',');
+
+        let imageBox = document.getElementById('image-box-' + index);
+
+        if (imageBox) {
+            imageBox.remove();
+        }
+
+        console.log("Removed:", removedImages);
+    }
+}
+
 
 let addons = [];
 
@@ -138,5 +158,6 @@ $(document).ready(function() {
 
     document.querySelector('[name="slug"]').value = slug;
 });
+
 
 

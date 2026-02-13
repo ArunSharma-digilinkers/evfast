@@ -112,72 +112,110 @@ public function create()
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Product $product)
-    {
-        $request->validate([
-            'category_id' => 'required|exists:categories,id',
-            'name'        => 'required|unique:products,name,' . $product->id,
-            'price'       => 'required|numeric',
-            'sale_price'  => 'nullable|numeric',
-            'quantity'    => 'required|integer',
-            'image'       => 'nullable|image|mimes:jpg,jpeg,png,webp',
-            'images.*'    => 'nullable|image|mimes:jpg,jpeg,png,webp',
-            'addons'      => 'nullable|array',
-            'addons.*'    => 'exists:products,id',
-        ]);
+public function update(Request $request, Product $product)
+{
+    $request->validate([
+        'category_id' => 'required|exists:categories,id',
+        'name'        => 'required|unique:products,name,' . $product->id,
+        'price'       => 'required|numeric',
+        'sale_price'  => 'nullable|numeric',
+        'quantity'    => 'required|integer',
+        'image'       => 'nullable|image|mimes:jpg,jpeg,png,webp',
+        'images.*'    => 'nullable|image|mimes:jpg,jpeg,png,webp',
+        'addons'      => 'nullable|array',
+        'addons.*'    => 'exists:products,id',
+    ]);
 
-        $data = [
-            'category_id'        => $request->category_id,
-            'name'               => $request->name,
-            'slug'               => Str::slug($request->name),
-            'price'              => $request->price,
-            'sale_price'         => $request->sale_price,
-            'gst_percentage'     => $request->gst_percentage ?? 0,
-            'gst_type'           => $request->gst_type ?? 'inclusive',
-            'shipping_type'      => $request->shipping_type ?? 'free',
-            'shipping_rate'      => $request->shipping_rate ?? 0,
-            'short_description'  => $request->short_description,
-            'technical_features' => $request->technical_features,
-            'warranty'           => $request->warranty,
-            'youtube_url'           => $request->youtube_url,
-            'quantity'           => $request->quantity,
-            'description'        => $request->description,
-            'status'             => $request->status,
-        ];
+    $data = [
+        'category_id'        => $request->category_id,
+        'name'               => $request->name,
+        'slug'               => Str::slug($request->name),
+        'price'              => $request->price,
+        'sale_price'         => $request->sale_price,
+        'gst_percentage'     => $request->gst_percentage ?? 0,
+        'gst_type'           => $request->gst_type ?? 'inclusive',
+        'shipping_type'      => $request->shipping_type ?? 'free',
+        'shipping_rate'      => $request->shipping_rate ?? 0,
+        'short_description'  => $request->short_description,
+        'technical_features' => $request->technical_features,
+        'warranty'           => $request->warranty,
+        'youtube_url'        => $request->youtube_url,
+        'quantity'           => $request->quantity,
+        'description'        => $request->description,
+        'status'             => $request->status,
+    ];
 
-        /* ---------- REPLACE MAIN IMAGE ---------- */
-        if ($request->hasFile('image')) {
-            if ($product->image) {
-                Storage::disk('public')->delete('products/' . $product->image);
-            }
+    /* ===============================
+       REPLACE MAIN IMAGE
+    =============================== */
+    if ($request->hasFile('image')) {
 
-            $mainImage = time() . '.' . $request->image->extension();
-            $request->image->storeAs('products', $mainImage, 'public');
-            $data['image'] = $mainImage;
+        if ($product->image) {
+            Storage::disk('public')->delete('products/' . $product->image);
         }
 
-        /* ---------- ADD MORE GALLERY IMAGES ---------- */
-        if ($request->hasFile('images')) {
-            $gallery = $product->images ?? [];
+        $mainImage = time() . '.' . $request->image->extension();
+        $request->image->storeAs('products', $mainImage, 'public');
 
-            foreach ($request->file('images') as $img) {
-                $name = uniqid() . '.' . $img->extension();
-                $img->storeAs('products/gallery', $name, 'public');
-                $gallery[] = $name;
-            }
-
-            $data['images'] = $gallery;
-        }
-
-        $product->update($data);
-
-        /* ---------- SYNC ADD-ONS ---------- */
-        $product->addons()->sync($request->addons ?? []);
-
-        return redirect()
-            ->route('admin.products.index')
-            ->with('success', 'Product updated successfully');
+        $data['image'] = $mainImage;
     }
+
+    /* ===============================
+       HANDLE GALLERY IMAGES
+    =============================== */
+
+    // Get existing images
+    $gallery = $product->images ?? [];
+
+    // 1️⃣ Remove selected images
+    if ($request->filled('removed_images')) {
+
+        $removedImages = explode(',', $request->removed_images);
+
+        foreach ($removedImages as $img) {
+
+            $img = trim($img);
+
+            // Delete from storage
+            Storage::disk('public')->delete('products/gallery/' . $img);
+
+            // Remove from array safely
+            $gallery = array_filter($gallery, function ($existing) use ($img) {
+                return $existing !== $img;
+            });
+        }
+    }
+
+    // 2️⃣ Add newly uploaded images
+    if ($request->hasFile('images')) {
+
+        foreach ($request->file('images') as $img) {
+
+            $name = uniqid() . '.' . $img->extension();
+            $img->storeAs('products/gallery', $name, 'public');
+
+            $gallery[] = $name;
+        }
+    }
+
+    // Reindex array and store
+    $data['images'] = array_values($gallery);
+
+    /* ===============================
+       UPDATE PRODUCT
+    =============================== */
+    $product->update($data);
+
+    /* ===============================
+       SYNC ADD-ONS
+    =============================== */
+    $product->addons()->sync($request->addons ?? []);
+
+    return redirect()
+        ->route('admin.products.index')
+        ->with('success', 'Product updated successfully');
+}
+
 
     /**
      * Remove the specified resource from storage.

@@ -1036,6 +1036,10 @@ table {
 	border: solid 1px $primary-color  !important;
 }
 
+.main-img {
+    max-height: 100%!important;
+    object-fit: contain;
+}
 // success
 
 .success-wrapper {
@@ -1265,6 +1269,10 @@ table {
 			grid-template-columns: repeat(4, 1fr);
 		}
 	}
+	.main-img {
+    max-height: 100%!important;
+    object-fit: contain;
+}
 
 }
 
