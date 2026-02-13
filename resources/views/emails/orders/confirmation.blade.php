@@ -56,7 +56,7 @@ th, td {
     <table class="no-border header-table">
         <tr>
             <td width="20%">
-                <img src="https://ev-fast.com/img/white-logo.png" class="logo">
+                <img src="{{ public_path('img/footer-logo.png') }}" height="60">
             </td>
 
             <td width="55%">
@@ -71,6 +71,7 @@ th, td {
             <td width="25%" class="right">
                 <div class="title">TAX INVOICE</div>
                 Invoice No: {{ $order->invoice_number ?? 'INV-'.$order->id }}<br>
+                Order Id: #{{ $order->id }}<br>
                 Date: {{ date('d-m-Y', strtotime($order->created_at)) }}
             </td>
         </tr>

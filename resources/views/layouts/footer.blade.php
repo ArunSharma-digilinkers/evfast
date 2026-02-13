@@ -9,7 +9,7 @@
         <div class="row">
             <div class="col-xl-3 col-lg-3 col-sm-12 mb-2">
                 <div class="footer-wrap">
-                    <img src="{{ asset('img/logo.png') }}" class="img-fluid logo-img">
+                    <img src="{{ asset('img/footer-logo.png') }}" class="img-fluid logo-img">
                     <p class="mrt30">
                         Accelerate electric vehicle charging revolution by offering the best charging experience to its
                         customers through affordable technology.

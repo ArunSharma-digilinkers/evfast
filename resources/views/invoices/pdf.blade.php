@@ -1,239 +1,202 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <title>Invoice {{ $order->invoice_number }}</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: DejaVu Sans, sans-serif; font-size: 12px; color: #333; line-height: 1.5; }
+<meta charset="utf-8">
+<style>
+body {
+    font-family: DejaVu Sans, sans-serif;
+    font-size: 12px;
+}
 
-        .invoice-wrapper { padding: 30px; }
+.container {
+    width: 100%;
+    border: 2px solid #000;
+    padding: 10px;
+}
 
-        /* Header */
-        .header { display: table; width: 100%; margin-bottom: 30px; border-bottom: 2px solid #2563eb; padding-bottom: 15px; }
-        .header-left { display: table-cell; width: 50%; vertical-align: top; }
-        .header-right { display: table-cell; width: 50%; vertical-align: top; text-align: right; }
-        .company-name { font-size: 22px; font-weight: bold; color: #2563eb; margin-bottom: 5px; }
-        .company-detail { font-size: 10px; color: #666; }
-        .invoice-title { font-size: 26px; font-weight: bold; color: #2563eb; }
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
 
-        /* Invoice Info */
-        .info-section { display: table; width: 100%; margin-bottom: 25px; }
-        .info-left { display: table-cell; width: 50%; vertical-align: top; }
-        .info-right { display: table-cell; width: 50%; vertical-align: top; text-align: right; }
-        .info-label { font-size: 10px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
-        .info-value { font-size: 12px; font-weight: bold; margin-bottom: 8px; }
+th, td {
+    border: 1px solid #000;
+    padding: 6px;
+}
 
-        /* Bill To */
-        .bill-to { background: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 25px; }
-        .bill-to-title { font-size: 10px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+.no-border td {
+    border: none !important;
+}
 
-        /* Items Table */
-        .items-table { width: 100%; border-collapse: collapse; margin-bottom: 25px; }
-        .items-table thead th { background: #2563eb; color: #fff; padding: 10px 8px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; text-align: left; }
-        .items-table thead th.text-right { text-align: right; }
-        .items-table thead th.text-center { text-align: center; }
-        .items-table tbody td { padding: 10px 8px; border-bottom: 1px solid #eee; font-size: 11px; }
-        .items-table tbody td.text-right { text-align: right; }
-        .items-table tbody td.text-center { text-align: center; }
+.center { text-align: center; }
+.right { text-align: right; }
+.bold { font-weight: bold; }
 
-        /* Summary */
-        .summary-section { display: table; width: 100%; margin-bottom: 30px; }
-        .summary-spacer { display: table-cell; width: 55%; }
-        .summary-box { display: table-cell; width: 45%; }
-        .summary-row { display: table; width: 100%; margin-bottom: 5px; }
-        .summary-label { display: table-cell; width: 60%; padding: 5px 0; color: #666; }
-        .summary-value { display: table-cell; width: 40%; padding: 5px 0; text-align: right; }
-        .summary-total { border-top: 2px solid #2563eb; margin-top: 5px; padding-top: 8px; }
-        .summary-total .summary-label,
-        .summary-total .summary-value { font-size: 14px; font-weight: bold; color: #2563eb; }
+.title {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
 
-        /* Footer */
-        .footer { border-top: 1px solid #eee; padding-top: 15px; text-align: center; color: #999; font-size: 10px; }
-        .footer p { margin-bottom: 3px; }
+.logo {
+    height: 60px;
+}
 
-        .text-success { color: #16a34a; }
-    </style>
+.header-table td {
+    vertical-align: top;
+}
+</style>
 </head>
 <body>
-    <div class="invoice-wrapper">
 
-        {{-- Header --}}
-        <div class="header">
-            <div class="header-left">
-                <div class="company-name">{{ config('invoice.company_name', 'EVFAST') }}</div>
-                @if(config('invoice.company_address'))
-                    <div class="company-detail">{{ config('invoice.company_address') }}</div>
+<div class="container">
+
+    <!-- HEADER -->
+    <table class="no-border header-table">
+        <tr>
+            <td width="20%">
+              <img src="{{ public_path('img/footer-logo.png') }}" height="60">
+            </td>
+
+            <td width="55%">
+                <b>Advance Ev Charging Solutions</b><br>
+                Regd.Add:- C-68, First Floor,<br>
+                Mangolpuri Industrial Area, Phase - I<br>
+                Delhi - 110083<br>
+                GSTIN/UIN: 07ABPFA6419B1ZK<br>
+                State Name : Delhi, Code : 07
+            </td>
+
+            <td width="23%" class="right">
+                <div class="title">TAX INVOICE</div>
+                Invoice No: {{ $order->invoice_number ?? 'INV-'.$order->id }}<br>
+                Order Id: #{{ $order->id }}<br>
+                Date: {{ date('d-m-Y', strtotime($order->created_at)) }}
+            </td>
+        </tr>
+    </table>
+
+    <br>
+
+    <!-- BILLING & SHIPPING -->
+    <table>
+        <tr class="bold">
+            <th width="50%">Bill To</th>
+            <th width="50%">Ship To</th>
+        </tr>
+        <tr>
+            <td>
+                {{ $order->name }}<br>
+                {{ $order->address }}<br>
+                {{ $order->city }} - {{ $order->pincode }}<br>
+                State: {{ $order->state }}<br>
+                Phone: {{ $order->phone }}<br>
+                @if($order->gstin)
+                GSTIN: {{ $order->gstin }}
                 @endif
-                @if(config('invoice.company_phone'))
-                    <div class="company-detail">Phone: {{ config('invoice.company_phone') }}</div>
-                @endif
-                @if(config('invoice.company_email'))
-                    <div class="company-detail">Email: {{ config('invoice.company_email') }}</div>
-                @endif
-                @if(config('invoice.company_gstin'))
-                    <div class="company-detail"><strong>GSTIN:</strong> {{ config('invoice.company_gstin') }}</div>
-                @endif
-                @if(config('invoice.company_pan'))
-                    <div class="company-detail"><strong>PAN:</strong> {{ config('invoice.company_pan') }}</div>
-                @endif
-            </div>
-            <div class="header-right">
-                <div class="invoice-title">INVOICE</div>
-            </div>
-        </div>
+            </td>
 
-        {{-- Invoice Info --}}
-        <div class="info-section">
-            <div class="info-left">
-                <div class="info-label">Invoice Number</div>
-                <div class="info-value">{{ $order->invoice_number }}</div>
+            <td>
+                {{ $order->shipping_name ?? $order->name }}<br>
+                {{ $order->shipping_address ?? $order->address }}<br>
+                {{ $order->shipping_city ?? $order->city }} - {{ $order->shipping_pincode ?? $order->pincode }}<br>
+                State: {{ $order->shipping_state ?? $order->state }}<br>
+                Phone: {{ $order->shipping_phone ?? $order->phone }}
+            </td>
+        </tr>
+    </table>
 
-                <div class="info-label">Invoice Date</div>
-                <div class="info-value">{{ $order->created_at->format('d M Y') }}</div>
+    <br>
 
-                <div class="info-label">Order ID</div>
-                <div class="info-value">#{{ $order->id }}</div>
-            </div>
-            <div class="info-right">
-                <div class="info-label">Payment Method</div>
-                <div class="info-value">{{ strtoupper($order->payment_method) }}</div>
+    <!-- PRODUCT TABLE -->
+    <table>
+        <thead>
+        <tr class="bold center">
+            <th>#</th>
+            <th>Description</th>
+            <th>HSN</th>
+            <th>Qty</th>
+            <th>Rate</th>
+            <th>Taxable</th>
+            <th>GST %</th>
+            <th>Total</th>
+        </tr>
+        </thead>
 
-                <div class="info-label">Payment ID</div>
-                <div class="info-value" style="font-size: 10px;">{{ $order->payment_id }}</div>
+        <tbody>
+        @foreach($order->items as $index => $item)
+        <tr>
+            <td class="center">{{ $index + 1 }}</td>
+            <td>{{ $item->product->name }}</td>
+            <td class="center">{{ $item->product->hsn_code }}</td>
+            <td class="center">{{ $item->quantity }}</td>
+            <td class="right">{{ number_format($item->price,2) }}</td>
+            <td class="right">{{ number_format($item->price * $item->quantity,2) }}</td>
+            <td class="center">{{ $item->product->gst_percentage }}%</td>
+            <td class="right">{{ number_format($item->total_price,2) }}</td>
+        </tr>
+        @endforeach
+        </tbody>
+    </table>
 
-                <div class="info-label">Payment Status</div>
-                <div class="info-value text-success">{{ strtoupper($order->payment_status) }}</div>
-            </div>
-        </div>
+    <br>
 
-        {{-- Bill To / Ship To --}}
-        <div style="display: table; width: 100%; margin-bottom: 25px;">
-            <div style="display: table-cell; width: {{ $order->has_separate_shipping ? '50%' : '100%' }}; vertical-align: top;">
-                <div class="bill-to" style="margin-bottom: 0; {{ $order->has_separate_shipping ? 'margin-right: 10px;' : '' }}">
-                    <div class="bill-to-title">Bill To</div>
-                    <strong>{{ $order->name }}</strong><br>
-                    {{ $order->email }} | {{ $order->phone }}<br>
-                    {{ $order->address }}<br>
-                    {{ $order->city }}, {{ $order->state }} - {{ $order->pincode }}
-                    @if($order->gstin)
-                        <br><strong>GSTIN:</strong> {{ $order->gstin }}
-                    @endif
-                </div>
-            </div>
-            @if($order->has_separate_shipping)
-            <div style="display: table-cell; width: 50%; vertical-align: top;">
-                <div class="bill-to" style="margin-bottom: 0; margin-left: 10px;">
-                    <div class="bill-to-title">Ship To</div>
-                    <strong>{{ $order->shipping_name }}</strong><br>
-                    {{ $order->shipping_phone }}<br>
-                    {{ $order->shipping_address }}<br>
-                    {{ $order->shipping_city }}, {{ $order->shipping_state }} - {{ $order->shipping_pincode }}
-                </div>
-            </div>
-            @endif
-        </div>
+    @php
+        $cgst = $order->gst_total / 2;
+        $sgst = $order->gst_total / 2;
+    @endphp
 
-        {{-- Items Table --}}
-        @php $hasSerials = $order->items->contains(fn($i) => $i->serial_number); @endphp
-        <table class="items-table">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Product</th>
-                    @if($hasSerials)
-                        <th>Serial No.</th>
-                    @endif
-                    <th class="text-center">Qty</th>
-                    <th class="text-right">Base Price</th>
-                    <th class="text-center">GST %</th>
-                    <th class="text-right">GST Amt</th>
-                    <th class="text-right">Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($order->items as $index => $item)
-                <tr>
-                    <td>{{ $index + 1 }}</td>
-                    <td>{{ $item->product->name ?? 'Product' }}</td>
-                    @if($hasSerials)
-                        <td>{{ $item->serial_number ?? '—' }}</td>
-                    @endif
-                    <td class="text-center">{{ $item->quantity }}</td>
-                    <td class="text-right">{{ number_format($item->base_price * $item->quantity, 2) }}</td>
-                    <td class="text-center">{{ $item->gst_percentage }}%</td>
-                    <td class="text-right">{{ number_format($item->gst_amount, 2) }}</td>
-                    <td class="text-right">{{ number_format($item->total_price, 2) }}</td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+    <!-- TOTAL SECTION -->
+    <table>
+        <tr>
+            <td width="65%" class="no-border"></td>
+            <td width="35%">
+                <table>
+                    <tr>
+                        <td>Subtotal</td>
+                        <td class="right">{{ number_format($order->subtotal,2) }}</td>
+                    </tr>
+                    <tr>
+                        <td>CGST</td>
+                        <td class="right">{{ number_format($cgst,2) }}</td>
+                    </tr>
+                    <tr>
+                        <td>SGST</td>
+                        <td class="right">{{ number_format($sgst,2) }}</td>
+                    </tr>
+                    <tr>
+                        <td>Shipping</td>
+                        <td class="right">{{ number_format($order->shipping_amount,2) }}</td>
+                    </tr>
+                    <tr class="bold">
+                        <td>Total</td>
+                        <td class="right">₹ {{ number_format($order->total_amount,2) }}</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
 
-        {{-- Summary --}}
-        <div class="summary-section">
-            <div class="summary-spacer"></div>
-            <div class="summary-box">
-                <div class="summary-row">
-                    <div class="summary-label">Subtotal</div>
-                    <div class="summary-value">{{ number_format($order->subtotal, 2) }}</div>
-                </div>
+    <br><br>
 
-                @if($order->discount_amount > 0)
-                <div class="summary-row">
-                    <div class="summary-label text-success">
-                        Discount
-                        @if($order->coupon)
-                            ({{ $order->coupon->code }})
-                        @endif
-                    </div>
-                    <div class="summary-value text-success">- {{ number_format($order->discount_amount, 2) }}</div>
-                </div>
-                @endif
+    <!-- FOOTER -->
+    <table class="no-border">
+        <tr>
+            <td width="60%">
+                <b>Declaration:</b><br>
+                1. Goods once sold will not be taken back.<br>
+                2. Subject to Delhi jurisdiction.
+            </td>
 
-                <div class="summary-row">
-                    <div class="summary-label">Shipping</div>
-                    <div class="summary-value">
-                        @if($order->shipping_amount > 0)
-                            {{ number_format($order->shipping_amount, 2) }}
-                        @else
-                            Free
-                        @endif
-                    </div>
-                </div>
+            <td width="40%" class="right">
+                For Advance Ev Charging Solutions<br><br><br>
+                Authorised Signatory
+            </td>
+        </tr>
+    </table>
 
-                @if($order->gst_total > 0)
-                <div class="summary-row">
-                    <div class="summary-label">
-                        GST
-                        @if($order->shipping_gst > 0)
-                            (incl. shipping GST {{ number_format($order->shipping_gst, 2) }})
-                        @endif
-                    </div>
-                    <div class="summary-value">+ {{ number_format($order->gst_total, 2) }}</div>
-                </div>
-                @endif
+</div>
 
-                <div class="summary-row summary-total">
-                    <div class="summary-label">Grand Total</div>
-                    <div class="summary-value">INR {{ number_format($order->total_amount, 2) }}</div>
-                </div>
-            </div>
-        </div>
-
-        {{-- Amount in Words --}}
-        <div style="margin-bottom: 25px; font-size: 11px;">
-            <strong>Amount in Words:</strong> INR {{ number_format($order->total_amount, 2) }}
-        </div>
-
-        {{-- Footer --}}
-        <div class="footer">
-            <p><strong>Thank you for your purchase!</strong></p>
-            <p>This is a computer-generated invoice and does not require a signature.</p>
-            @if(config('invoice.company_gstin'))
-                <p>{{ config('invoice.company_name') }} | GSTIN: {{ config('invoice.company_gstin') }}</p>
-            @endif
-        </div>
-
-    </div>
 </body>
 </html>
