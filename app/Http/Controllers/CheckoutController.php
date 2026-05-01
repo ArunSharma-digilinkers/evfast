@@ -418,8 +418,17 @@ class CheckoutController extends Controller
                 $user->update(['gstin' => $request->gstin]);
             }
 
-            // Save address for new users
-            if ($isNewUser) {
+            // Save billing address if not already in this user's address book
+            $billingExists = Address::where('user_id', $user->id)
+                ->where('address', $request->address)
+                ->where('pincode', $request->pincode)
+                ->exists();
+
+            if (!$billingExists) {
+                $hasDefault = Address::where('user_id', $user->id)
+                    ->where('is_default', true)
+                    ->exists();
+
                 Address::create([
                     'user_id' => $user->id,
                     'label' => 'Billing',
@@ -429,10 +438,17 @@ class CheckoutController extends Controller
                     'pincode' => $request->pincode,
                     'state' => $request->state,
                     'city' => $request->city,
-                    'is_default' => true,
+                    'is_default' => !$hasDefault,
                 ]);
+            }
 
-                if ($shipToDifferent) {
+            if ($shipToDifferent) {
+                $shippingExists = Address::where('user_id', $user->id)
+                    ->where('address', $request->shipping_address)
+                    ->where('pincode', $request->shipping_pincode)
+                    ->exists();
+
+                if (!$shippingExists) {
                     Address::create([
                         'user_id' => $user->id,
                         'label' => 'Shipping',
