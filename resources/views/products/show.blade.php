@@ -6,30 +6,63 @@
 
         <div class="row g-5">
 
-            {{-- LEFT : IMAGE GALLERY --}}
-            <div class="col-md-6">
+     <div class="col-md-6 product-gallery">
 
-                @php
-                $gallery = $product->images ?? [];
-                @endphp
+    @php
+        $gallery = $product->images ?? [];
+    @endphp
 
-                {{-- Main Image --}}
-                <div class="border rounded flex-fill text-center product-main-image">
-                    <img id="mainImage" src="{{ asset('storage/products/' . $product->image) }}"
-                        class="img-fluid main-img" alt="{{ $product->name }}">
-                </div>
-                   {{-- Thumbnails --}}
-                <div class="me-3 mt-3">
-                    <img src="{{ asset('storage/products/' . $product->image) }}"
-                        class="img-thumbnail thumb active-thumb" onclick="changeImage(this)">
+    <div class="d-flex flex-row flex-md-row gap-3">
 
-                    @foreach ($gallery as $img)
-                    <img src="{{ asset('storage/products/gallery/' . $img) }}" class="img-thumbnail thumb"
-                        onclick="changeImage(this)">
-                    @endforeach
-                </div>
+       <!-- MAIN THUMB -->
+<img src="{{ asset('storage/products/' . $product->image) }}"
+     class="thumb active-thumb mb-2"
+     data-src="{{ asset('storage/products/' . $product->image) }}"
+     data-index="0" loading="lazy">
+
+<!-- GALLERY -->
+@foreach ($gallery as $index => $img)
+<img src="{{ asset('storage/products/gallery/' . $img) }}"
+     class="thumb"
+     data-src="{{ asset('storage/products/gallery/' . $img) }}"
+     data-index="{{ $index + 1 }}" loading="lazy">
+@endforeach
+        </div>
+
+        <!-- MAIN SLIDER -->
+        <div class="main-slider position-relative flex-fill text-center">
+
+            <img id="mainImage" class="img-fluid main-img" loading="lazy">
+
+            <!-- PREV -->
+            <button class="slider-btn prev">‹</button>
+
+            <!-- NEXT -->
+            <button class="slider-btn next">›</button>
+
+            <!-- ZOOM ICON -->
+            <span class="zoom-icon">
+                <i class="fas fa-search-plus"></i>
+            </span>
+        </div>
+
+    </div>
+
+
+<!-- MODAL -->
+<div class="modal fade" id="imageModal">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content bg-transparent border-0">
+
+            <button class="btn-close position-absolute end-0 m-3 bg-white" data-bs-dismiss="modal"></button>
+
+            <div class="text-center">
+                <img id="modalImage" class="img-fluid">
             </div>
 
+        </div>
+    </div>
+</div>
             {{-- RIGHT : PRODUCT INFO --}}
             <div class="col-md-6">
 
@@ -47,16 +80,21 @@
                     </h3>
 
                     @if ($product->sale_price && $product->sale_price > $product->price)
+
                     <span class="text-muted fs-6 text-decoration-line-through ms-2">
                         ₹{{ number_format($product->sale_price) }}
                     </span>
+
                     @php
-                    $discountPct = round(
-                    (($product->sale_price - $product->price) / $product->sale_price) * 100,
+                    $discountPct = floor(
+                    (($product->sale_price - $product->price) / $product->sale_price) * 100
                     );
                     @endphp
+
                     <span class="badge bg-danger ms-2">{{ $discountPct }}% off</span>
+
                     @endif
+
                 </div>
 
                 <p class="text-muted small mb-3">
@@ -69,7 +107,18 @@
                     @else
                     Price inclusive of all taxes
                     @endif
-                    <br>Free Shipping
+                    <br>
+                    @php
+                    $shipping = strtolower($product->shipping_type ?? '');
+                    @endphp
+
+                    @if($shipping === 'free')
+                    Free Shipping
+                    @elseif($shipping === 'zone')
+                    Shipping charges extra
+                    @else
+                    Shipping charges extra
+                    @endif
                 </p>
 
                 {{-- FEATURES (CKEDITOR CONTENT) --}}
@@ -102,11 +151,6 @@
                             Buy Now
                         </button>
 
-                        <a href="https://wa.me/918595264742?text={{ urlencode($product->name) }}" target="_blank"
-                            class="btn-submit">
-                            <i class="fab fa-whatsapp me-1"></i> Any query..?
-                        </a>
-
                     </div>
                 </div>
                 @else
@@ -132,8 +176,8 @@
                         <a href="{{ route('cart.index') }}" class="btn-submit">
                             <i class="fas fa-shopping-cart me-1"></i> Go to Cart
                         </a>
-                        <a href="{{ route('category.products', $product->category->slug) }}" class="btn-submit"
-                            style="background: #fff; color: #0f9b0f; border: 2px solid #0f9b0f;">
+                        <a href="{{ route('category.products', $product->category->slug)
+                            }}" class="btn-submit">
                             Keep Shopping
                         </a>
                     </div>
@@ -169,7 +213,7 @@
                         </div>
                     </div>
                     @endif
-                    
+
                     {{-- TECHNICAL FEATURES --}}
                     @if(!empty($product->technical_features))
                     <div class="accordion-item">
@@ -226,7 +270,7 @@
                 <a href="{{ route('product.show', $addon->slug) }}" class="text-decoration-none text-dark">
                     <div class="card text-center p-3 h-100 addon-card border border-success rounded">
                         <img src="{{ asset('storage/products/' . $addon->image) }}" class="img-fluid mb-3"
-                            alt="{{ $addon->name }}" style="height: 180px; object-fit: contain;">
+                            alt="{{ $addon->name }}" style="height: 180px; object-fit: contain;" loading="lazy">
 
                         <h6 class="fw-bold mb-2">{{ $addon->name }}</h6>
 
@@ -363,28 +407,81 @@ function addToCart() {
 
 {{-- CSS --}}
 <style>
+.thumbs {
+    width: 80px;
+}
+
 .thumb {
-    width: 70px;
+    width: 100%;
+    height: 70px;
+    object-fit: cover;
     cursor: pointer;
     border: 2px solid transparent;
+    border-radius: 5px;
 }
 
 .active-thumb {
     border-color: #198754;
 }
 
+/* MAIN IMAGE */
 .main-img {
     max-height: 420px;
     object-fit: contain;
+    cursor: zoom-in;
 }
 
-.addon-card {
-    transition: box-shadow 0.2s, transform 0.2s;
+/* SLIDER BUTTONS */
+.slider-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    border: none;
+    font-size: 30px;
+    padding: 5px 12px;
+    cursor: pointer;
+    z-index: 2;
 }
 
-.addon-card:hover {
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    transform: translateY(-3px);
+.prev { left: 10px; }
+.next { right: 10px; }
+
+/* ZOOM ICON */
+.zoom-icon {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    padding: 8px;
+    border-radius: 50%;
+}
+
+/* MOBILE */
+@media (max-width: 767px) {
+    .thumbs {
+        flex-direction: row !important;
+        width: 100%;
+    }
+
+    .thumb {
+        width: 60px;
+        height: 60px;
+    }
+}
+
+/* Chrome, Safari, Edge */
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+    -moz-appearance: textfield;
 }
 </style>
 @endsection

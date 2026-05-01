@@ -6,11 +6,23 @@ use Illuminate\Database\Eloquent\Model;
 
 class OrderItem extends Model
 {
-       protected $fillable = [
-        'order_id', 'product_id', 'quantity', 'price',
-        'base_price', 'gst_percentage', 'gst_amount', 'discount_amount', 'total_price',
-        'serial_number',
-    ];
+     protected $fillable = [
+    'order_id',
+    'product_id',
+    'quantity',
+    'price',
+    'base_price',
+    'gst_percentage',
+    'gst_amount',
+    'discount_amount',
+    'total_price',
+    'serial_number',
+
+    // ✅ New fields
+    'courier_name',
+    'tracking_number',
+    'dispatch_date',
+];
 
     public function product()
     {

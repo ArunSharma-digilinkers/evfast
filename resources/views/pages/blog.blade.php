@@ -1,8 +1,8 @@
 @extends('layouts.main')
 
-@section('title', 'EvFast| Latest Battery Insights')
+@section('title', 'EV Car Charger Blogs & Guides | EVFAST India')
 
-@section('description', '')
+@section('description', 'Read EVFAST EV car charger blogs, tips and complete guides on portable, AC and DC charging solutions for smarter electric mobility.')
 
 @section('keywords', '')
 

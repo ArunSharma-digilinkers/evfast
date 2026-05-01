@@ -1,4 +1,11 @@
 @extends('layouts.main')
+
+@section('title', 'AC Charger for Electric Vehicle | EVFAST India')
+
+@section('description', 'EVFAST offers AC charger for electric vehicle charging with smart, safe and efficient solutions for homes, workplaces and fleets.')
+
+@section('keywords', '')
+
 @section('content')
 
 <div class="main-wrapper">
@@ -26,7 +33,7 @@
                             <div class="product-img">
                                 <img src="{{ $product->image
                         ? asset('storage/products/'.$product->image)
-                        : asset('img/no-image.png') }}" alt="{{ $product->name }}">
+                        : asset('img/no-image.png') }}" alt="{{ $product->name }}" loading="lazy"> 
                             </div>
 
                             <div class="product-body">

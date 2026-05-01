@@ -1,4 +1,11 @@
 @extends('layouts.main')
+
+@section('title', 'Portable EV Car Charger | EVFAST Chargers')
+
+@section('description', 'Explore EVFAST portable EV car chargers in 3.6kW & 7.4kW models. Safe, smart, and reliable charging for home and travel use.')
+
+@section('keywords', '')
+
 @section('content')
 
 <div class="main-wrapper">
@@ -8,7 +15,7 @@
             <div class="row">
                 <div class="col-lg-12 text-center">
                     <span class="sub-title">Future-Ready Charging Solutions</span>
-                    <h2>Portable EV Charger </h2>
+                    <h2>Portable EV Car Chargers </h2>
                 </div>
                 <div class="inner-product-grid">
     @forelse($products as $product)
@@ -28,7 +35,7 @@
                     <img src="{{ $product->image
                         ? asset('storage/products/'.$product->image)
                         : asset('img/no-image.png') }}"
-                         alt="{{ $product->name }}">
+                         alt="{{ $product->name }}" loading="lazy">
                 </div>
 
                 <div class="product-body">

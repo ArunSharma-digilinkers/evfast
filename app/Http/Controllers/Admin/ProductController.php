@@ -86,6 +86,7 @@ public function create()
             'quantity'             => $request->quantity,
             'description'          => $request->description,
             'status'               => $request->status ?? 1,
+            'is_new_arrival' => $request->has('is_new_arrival') ? 1 : 0,
             'image'                => $mainImage,
             'images'               => $gallery,
             'hsn_code'               => $request->hsn_code,
@@ -144,6 +145,7 @@ public function update(Request $request, Product $product)
         'quantity'           => $request->quantity,
         'description'        => $request->description,
         'status'             => $request->status,
+         'is_new_arrival' => $request->has('is_new_arrival') ? 1 : 0,
         'hsn_code'             => $request->hsn_code,
     ];
 

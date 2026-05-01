@@ -1,10 +1,17 @@
 @extends('layouts.main')
+
+@section('title', 'About EVFAST | EV Charging Solutions Company')
+
+@section('description', 'Learn about EVFAST, delivering smart EV charging solutions with advanced technology, safety, and support for homes and businesses.')
+
+@section('keywords', '')
+
 @section('content')
 
 <div class="main-wrapper">
 
     <div class="banner-wrapper">
-        <img src="{{ asset('img/about-banner.jpg') }}" alt="" class="img-fluid">
+        <img src="{{ asset('img/about-banner.webp') }}" alt="about banner" class="img-fluid" loading="lazy">
     </div>
 
     <div class="about-wrapper section-entry">
@@ -33,14 +40,14 @@
                     </p>
                 </div>
                 <div class="col-lg-6 col-md-12 col-sm-12">
-                    <img src="{{ asset('img/about-img.jpg') }}" alt="" class="img-fluid">
+                    <img src="{{ asset('img/about-img.webp') }}" alt="about image" class="img-fluid" loading="lazy">
                 </div>
             </div>
         </div>
     </div>
 
     <section class="cta-section">
-        <h2>Power the Future with Smart EV Charging</h2>
+        <h2>Power the Future with Smart EV Charger</h2>
         <p class="text-white">Fast, reliable, and future-ready EV charging solutions for homes, businesses, and fleets.
         </p>
         <div class="cta-btns">
@@ -65,7 +72,7 @@
                         </div>
                         <h4>Advanced Technology</h4>
                         <p>
-                            We use cutting-edge EV and battery technology to deliver
+                            We use cutting-edge EV technology to deliver
                             high performance and long-lasting solutions.
                         </p>
                     </div>

@@ -1,3 +1,67 @@
+document.addEventListener("DOMContentLoaded", function () {
+
+    const thumbs = document.querySelectorAll(".thumb");
+    const mainImage = document.getElementById("mainImage");
+    const modalImage = document.getElementById("modalImage");
+
+    let images = [];
+    let currentIndex = 0;
+
+    // GET IMAGES FROM THUMBS
+    thumbs.forEach(thumb => {
+        images.push(thumb.dataset.src);
+    });
+
+    if (!images.length || !mainImage) return;
+
+    // INITIAL IMAGE
+    mainImage.src = images[0];
+
+    function updateImage() {
+        mainImage.src = images[currentIndex];
+
+        thumbs.forEach((thumb, index) => {
+            thumb.classList.toggle("active-thumb", index === currentIndex);
+        });
+    }
+
+    // NEXT BUTTON
+    const nextBtn = document.querySelector(".next");
+    if (nextBtn) {
+        nextBtn.addEventListener("click", () => {
+            currentIndex = (currentIndex + 1) % images.length;
+            updateImage();
+        });
+    }
+
+    // PREV BUTTON
+    const prevBtn = document.querySelector(".prev");
+    if (prevBtn) {
+        prevBtn.addEventListener("click", () => {
+            currentIndex = (currentIndex - 1 + images.length) % images.length;
+            updateImage();
+        });
+    }
+
+    // THUMB CLICK
+    thumbs.forEach(thumb => {
+        thumb.addEventListener("click", function () {
+            currentIndex = parseInt(this.dataset.index);
+            updateImage();
+        });
+    });
+
+    // MODAL
+    if (modalImage) {
+        mainImage.addEventListener("click", function () {
+            modalImage.src = this.src;
+            new bootstrap.Modal(document.getElementById("imageModal")).show();
+        });
+    }
+
+});
+
+
   document.querySelectorAll('.ckeditor').forEach((editor) => {
         ClassicEditor
             .create(editor, {
@@ -111,6 +175,66 @@ $(document).ready(function () {
     });
 });
 
+$(document).ready(function () {
+
+    var owl = $('.gallery-carousel');
+
+    owl.owlCarousel({
+        loop: false,
+        margin: 25,
+        autoplay: false,
+        smartSpeed: 800,
+        dots: true,
+        nav: true,
+navText: [
+    '<i class="fa fa-angle-left"></i>',
+    '<i class="fa fa-angle-right"></i>'
+],
+        responsive: {
+            0: { items: 4 },
+            768: { items: 4 },
+            1200: { items: 4 }
+        },
+        onInitialized: toggleNav,
+        onResized: toggleNav
+    });
+
+    function toggleNav(event) {
+        var carousel = event.relatedTarget;
+        var currentItems = carousel.settings.items;
+        var totalItems = carousel.items().length;
+
+        if (totalItems <= currentItems) {
+            $(event.target).find('.owl-nav').hide();
+        } else {
+            $(event.target).find('.owl-nav').show();
+        }
+    }
+
+});
+
+
+function changeImage(element) {
+
+    // Change main image
+    var mainImage = document.getElementById("mainImage");
+    mainImage.src = element.src;
+
+    // Remove active class
+    document.querySelectorAll('.thumb').forEach(function(img) {
+        img.classList.remove('active-thumb');
+    });
+
+    // Add active class to clicked
+    element.classList.add('active-thumb');
+
+    // Auto Scroll to Main Image
+    document.querySelector('.product-main-image').scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+    });
+
+}
 
 
 $(document).ready(function () {
@@ -158,6 +282,9 @@ $(document).ready(function() {
 
     document.querySelector('[name="slug"]').value = slug;
 });
+
+
+
 
 
 

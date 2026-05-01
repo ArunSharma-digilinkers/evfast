@@ -3,7 +3,7 @@
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
             <a class="navbar-brand" href="{{ url('/') }}">
-                <img src="{{ asset('img/logo.png') }}" alt="" class="img-fluid logo-img">
+                <img src="{{ asset('img/logo.png') }}" alt="logo" class="img-fluid logo-img" loading="lazy">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -19,8 +19,8 @@
                            Our Products
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="servicesDropdown">
-                            <li><a class="dropdown-item" href="{{ url('portable-ev-chargers') }}">Portable EV Charger</a></li>
-                            <li><a class="dropdown-item" href="{{ url('popular-ac-charger') }}">	Popular AC Charger</a></li>
+                            <li><a class="dropdown-item" href="{{ url('portable-ev-car-chargers') }}">Portable EV Car Charger</a></li>
+                            <li><a class="dropdown-item" href="{{ url('popular-ev-car-charger') }}">Popular EV Car Charger</a></li>
                             <li><a class="dropdown-item" href="{{ url('ac-chargers') }}">AC Charger</a></li>
                             <li><a class="dropdown-item" href="{{ url('dc-chargers') }}">DC Charger</a></li>
                             <li><a class="dropdown-item" href="{{ url('gun-holders') }}">Gun Holder</a></li>
@@ -28,6 +28,7 @@
                         </ul>
                     </li>
 
+                    <li class="nav-item"><a class="nav-link" href="{{ url('career') }}">Career</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url('blog') }}">Blog</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url('contact-us') }}">Contact Us</a></li>
 

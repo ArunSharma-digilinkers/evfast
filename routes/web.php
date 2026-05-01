@@ -21,12 +21,19 @@ use App\Models\Order;
 Route::get('/', [PagesController::class, 'index']);
 Route::get('about-us', [PagesController::class, 'about']);
 Route::get('contact-us', [PagesController::class, 'contact']);
-Route::get('portable-ev-chargers', [PagesController::class, 'portableevchargers']);
-Route::get('popular-ac-charger', [PagesController::class, 'popularac']);
+Route::post('/contact-us', [PagesController::class,'sendMail'])->name('contact.submit');
+Route::get('portable-ev-car-chargers', [PagesController::class, 'portableevchargers']);
+Route::get('popular-ev-car-charger', [PagesController::class, 'popularac']);
 Route::get('ac-chargers', [PagesController::class, 'acchargers']);
 Route::get('dc-chargers', [PagesController::class, 'dcchargers']);
 Route::get('gun-holders', [PagesController::class, 'gunholders']);
 Route::get('accessories', [PagesController::class, 'accessories']);
+Route::get('career', [PagesController::class, 'careers']);
+Route::post('/career', [PagesController::class, 'store'])->name('career.store');
+
+Route::get('privacy-policy', [PagesController::class, 'privacy']);
+Route::get('terms', [PagesController::class, 'term']);
+Route::get('refund-policy', [PagesController::class, 'refund']);
 
 Route::get('/blog', [PagesController::class, 'blog'])->name('blog');
 Route::get('/details/{slug}', [PagesController::class, 'show'])->name('details.show');
@@ -48,6 +55,11 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('shipping-zones', ShippingZoneController::class)->except('show');
     Route::resource('blog', BlogController::class);
     Route::resource('abandoned-checkouts', App\Http\Controllers\Admin\AbandonedCheckoutController::class)->only(['index', 'show', 'destroy']);
+        Route::get('career-applications', [PagesController::class, 'applications'])
+            ->name('career.index');
+            Route::delete('career-applications/{id}', [PagesController::class, 'destroy'])
+    ->name('career.destroy');
+
 });
 
 // Category products page
@@ -77,49 +89,47 @@ Route::prefix('user')
 
     });
 
-Route::post('/cart/add/{slug}', [CartController::class, 'add'])->name('cart.add');
-Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-Route::post('/cart/update/{slug}', [CartController::class, 'update'])->name('cart.update');
-Route::get('/cart/remove/{slug}', [CartController::class, 'remove'])->name('cart.remove');
+    Route::post('/cart/add/{slug}', [CartController::class, 'add'])->name('cart.add');
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart/update/{slug}', [CartController::class, 'update'])->name('cart.update');
+    Route::get('/cart/remove/{slug}', [CartController::class, 'remove'])->name('cart.remove');
 
 
 
-// Checkout (Guest allowed)
-Route::get('/checkout', [CheckoutController::class, 'index'])
-    ->name('checkout');
+    // Checkout (Guest allowed)
+    Route::get('/checkout', [CheckoutController::class, 'index'])
+        ->name('checkout');
 
-Route::post('/checkout/place', [CheckoutController::class, 'placeOrder'])
-    ->name('checkout.place');
+    Route::post('/checkout/place', [CheckoutController::class, 'placeOrder'])
+        ->name('checkout.place');
 
-Route::post('/checkout/apply-coupon', [CheckoutController::class, 'applyCoupon'])
-    ->name('checkout.applyCoupon');
+    Route::post('/checkout/apply-coupon', [CheckoutController::class, 'applyCoupon'])
+        ->name('checkout.applyCoupon');
 
-Route::get('/checkout/remove-coupon', [CheckoutController::class, 'removeCoupon'])
-    ->name('checkout.removeCoupon');
+    Route::get('/checkout/remove-coupon', [CheckoutController::class, 'removeCoupon'])
+        ->name('checkout.removeCoupon');
 
-Route::get('/checkout/shipping-cost', [CheckoutController::class, 'getShippingCost'])
-    ->name('checkout.shippingCost');
+    Route::get('/checkout/shipping-cost', [CheckoutController::class, 'getShippingCost'])
+        ->name('checkout.shippingCost');
 
-Route::post('/checkout/save-abandoned', [CheckoutController::class, 'saveAbandonedCheckout'])
-    ->name('checkout.saveAbandoned');
+    Route::post('/checkout/save-abandoned', [CheckoutController::class, 'saveAbandonedCheckout'])
+        ->name('checkout.saveAbandoned');
 
-Route::get('/checkout/address/{address}', [CheckoutController::class, 'getAddress'])
-    ->middleware('auth')
-    ->name('checkout.getAddress');
+    Route::get('/checkout/address/{address}', [CheckoutController::class, 'getAddress'])
+        ->middleware('auth')
+        ->name('checkout.getAddress');
 
-Route::get('/payment-success/{order}', function (Order $order) {
-    return view('payment.success', compact('order'));
-})->name('payment.success');
+    Route::get('/payment-success/{order}', function (Order $order) {
+        return view('payment.success', compact('order'));
+    })->name('payment.success');
 
-// Invoice downloads
-Route::get('/invoice/{order}', [InvoiceController::class, 'download'])
-    ->middleware('auth')
-    ->name('invoice.download');
+    // Invoice downloads
+    Route::get('/invoice/{order}', [InvoiceController::class, 'download'])
+        ->middleware('auth')
+        ->name('invoice.download');
 
-Route::post('/admin/invoices/bulk-download', [InvoiceController::class, 'bulkDownload'])
-    ->middleware(['auth', 'role:admin'])
-    ->name('admin.invoices.bulk');
-
-
+    Route::post('/admin/invoices/bulk-download', [InvoiceController::class, 'bulkDownload'])
+        ->middleware(['auth', 'role:admin'])
+        ->name('admin.invoices.bulk');
 
 require __DIR__.'/auth.php';

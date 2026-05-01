@@ -81,42 +81,77 @@
                 </div>
 
                 <div class="mt-3">
-                    <form action="{{ route('admin.orders.updateStatus', $order->id) }}" method="POST">
-                        @csrf
-                        <div class="d-flex align-items-center gap-2 flex-wrap mb-3">
-                            <select name="status" id="order-status-select" class="form-select d-inline-block" style="width: auto;">
-                                <option value="pending" {{ $order->status=='pending' ? 'selected' : '' }}>Pending</option>
-                                <option value="dispatched" {{ $order->status=='dispatched' ? 'selected' : '' }}>Dispatched</option>
-                                <option value="completed" {{ $order->status=='completed' ? 'selected' : '' }}>Completed</option>
-                                <option value="canceled" {{ $order->status=='canceled' ? 'selected' : '' }}>Canceled</option>
-                            </select>
-                            <button class="btn btn-success">Update Status</button>
+                   <form action="{{ route('admin.orders.updateStatus', $order->id) }}" method="POST">
+    @csrf
 
-                            @if($order->invoice_number && in_array($order->status, ['dispatched', 'completed']))
-                                <a href="{{ route('invoice.download', $order->id) }}" class="btn btn-outline-success">
-                                    <i class="fas fa-file-pdf me-1"></i> Download Invoice
-                                </a>
-                            @endif
-                        </div>
+    <div class="d-flex align-items-center gap-2 flex-wrap mb-3">
+        <select name="status" id="order-status-select" class="form-select" style="width: auto;">
+            <option value="pending" {{ $order->status=='pending' ? 'selected' : '' }}>Pending</option>
+            <option value="dispatched" {{ $order->status=='dispatched' ? 'selected' : '' }}>Dispatched</option>
+            <option value="completed" {{ $order->status=='completed' ? 'selected' : '' }}>Completed</option>
+            <option value="canceled" {{ $order->status=='canceled' ? 'selected' : '' }}>Canceled</option>
+        </select>
 
-                        {{-- Serial number inputs (shown when dispatched is selected) --}}
-                        <div id="serial-numbers-section" style="display: none;">
-                            <div class="card bg-light p-3 mb-2">
-                                <h6 class="fw-bold mb-3">Enter Serial Numbers for Each Item</h6>
-                                @foreach($order->items as $item)
-                                    <div class="mb-2">
-                                        <label class="form-label mb-1">
-                                            {{ $item->product->name ?? 'Deleted Product' }}
-                                        </label>
-                                        <input type="text" name="serial_numbers[{{ $item->id }}]"
-                                               class="form-control form-control-sm"
-                                               value="{{ old('serial_numbers.' . $item->id, $item->serial_number) }}"
-                                               placeholder="Enter serial number">
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    </form>
+        <button class="btn btn-success">Update Status</button>
+
+        @if($order->invoice_number && in_array($order->status, ['dispatched', 'completed']))
+            <a href="{{ route('invoice.download', $order->id) }}" class="btn btn-outline-success">
+                Download Invoice
+            </a>
+        @endif
+    </div>
+
+    {{-- SERIAL NUMBERS --}}
+    <div id="serial-numbers-section" style="display:none;">
+        <div class="card bg-light p-3 mb-2">
+            <h6 class="fw-bold mb-3">Serial Numbers (Optional)</h6>
+
+            @foreach($order->items as $item)
+                <div class="mb-2">
+                    <label class="form-label">
+                        {{ $item->product->name ?? 'Deleted Product' }}
+                    </label>
+                    <input type="text"
+                           name="serial_numbers[{{ $item->id }}]"
+                           class="form-control form-control-sm"
+                           value="{{ old('serial_numbers.' . $item->id, $item->serial_number) }}"
+                           placeholder="Enter serial number (optional)">
+                </div>
+            @endforeach
+
+        </div>
+    </div>
+
+    {{-- DISPATCH DETAILS --}}
+    <div id="dispatch-section" style="display:none;">
+        <div class="card bg-light p-3 mb-2">
+            <h6 class="fw-bold mb-3">Dispatch Details</h6>
+
+            <div class="mb-2">
+                <label>Courier Name</label>
+                <input type="text" name="courier_name"
+                       class="form-control form-control-sm"
+                       value="{{ old('courier_name.' . $item->id, $item->courier_name) }}">
+            </div>
+
+            <div class="mb-2">
+                <label>Tracking Number</label>
+                <input type="text" name="tracking_number"
+                       class="form-control form-control-sm"
+                       value="{{ old('tracking_number.' . $item->id, $item->tracking_number) }}">
+            </div>
+
+            <div class="mb-2">
+                <label>Dispatch Date</label>
+                <input type="date" name="dispatch_date"
+                       class="form-control form-control-sm"
+                       value="{{ old('dispatch_date.' . $item->id, $item->dispatch_date) }}">
+            </div>
+
+        </div>
+    </div>
+
+</form>
                 </div>
 
             </div>
@@ -128,16 +163,28 @@
 
 @section('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const statusSelect = document.getElementById('order-status-select');
-        const serialSection = document.getElementById('serial-numbers-section');
+document.addEventListener('DOMContentLoaded', function() {
 
-        function toggleSerialNumbers() {
-            serialSection.style.display = statusSelect.value === 'dispatched' ? 'block' : 'none';
+    const statusSelect = document.getElementById('order-status-select');
+    const serialSection = document.getElementById('serial-numbers-section');
+    const dispatchSection = document.getElementById('dispatch-section');
+
+    function toggleSections() {
+        if (statusSelect.value === 'dispatched') {
+            serialSection.style.display = 'block';
+            dispatchSection.style.display = 'block';
+        } else {
+            serialSection.style.display = 'none';
+            dispatchSection.style.display = 'none';
         }
+    }
 
-        toggleSerialNumbers();
-        statusSelect.addEventListener('change', toggleSerialNumbers);
-    });
+    // Run on page load
+    toggleSections();
+
+    // Run on change
+    statusSelect.addEventListener('change', toggleSections);
+
+});
 </script>
 @endsection

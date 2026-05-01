@@ -66,13 +66,13 @@
 
                                 </div>
 
-                                 <div class="col-md-4">
+                                <div class="col-md-4">
                                     <!-- Product Name -->
                                     <div class="mb-3">
-                                        <label class="form-label">HSN Code <span
-                                                class="text-danger"></span></label>
-                                        <input type="number" name="hsn_code" value="{{ old('hsn_code', $product->hsn_code) }}"
-                                            class="form-control" required>
+                                        <label class="form-label">HSN Code <span class="text-danger"></span></label>
+                                        <input type="number" name="hsn_code"
+                                            value="{{ old('hsn_code', $product->hsn_code) }}" class="form-control"
+                                            required>
                                     </div>
 
                                 </div>
@@ -246,6 +246,20 @@
                                     <option value="1" {{ $product->status ? 'selected' : '' }}>Active</option>
                                     <option value="0" {{ !$product->status ? 'selected' : '' }}>Inactive</option>
                                 </select>
+                            </div>
+                            <!-- Product Labels -->
+                            <div class="mb-4">
+                                <label class="form-label">Product Labels</label>
+
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" name="is_new_arrival" value="1"
+                                        id="newArrivalSwitch"
+                                        {{ old('is_new_arrival', $product->is_new_arrival) ? 'checked' : '' }}>
+
+                                    <label class="form-check-label" for="newArrivalSwitch">
+                                        Mark as New Arrival
+                                    </label>
+                                </div>
                             </div>
 
                             <!-- Buttons -->

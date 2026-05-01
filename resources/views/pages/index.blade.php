@@ -1,4 +1,11 @@
 @extends('layouts.main')
+
+@section('title', 'EV Charger Manufacturer in India | EVFast Charger')
+
+@section('description', 'EVFast is a trusted EV charger manufacturer in India offering portable, AC and DC charging solutions for home and business use.')
+
+@section('keywords', 'ev car charger,portable ev charger,portable ev car charger,ev charger manufacturer,7.4 kw ev charger,ev dummy socket,ev charging station for home,electric car charger,electric vehicle charger,ev charger for home')
+
 @section('content')
 
 <div class="main-wrapper">
@@ -18,22 +25,22 @@
 
         <div class="carousel-inner">
             <div class="carousel-item active">
-                <img src="{{ asset('img/portable-charger.jpg') }}" class="d-block w-100" alt="">
+                <img src="{{ asset('img/portable-charger.webp') }}" class="d-block w-100" alt="Banner" loading="lazy">
             </div>
             <div class="carousel-item">
-                <img src="{{ asset('img/wall-mount-ev-charger.jpg') }}" class="d-block w-100" alt="">
+                <img src="{{ asset('img/wall-mount-ev-charger.webp') }}" class="d-block w-100" alt="Banner" loading="lazy">
             </div>
             <div class="carousel-item">
-                <img src="{{ asset('img/ac-charger.jpg') }}" class="d-block w-100" alt="">
+                <img src="{{ asset('img/ac-charger.webp') }}" class="d-block w-100" alt="Banner" loading="lazy">
             </div>
             <div class="carousel-item">
-                <img src="{{ asset('img/EV-accessories.jpg') }}" class="d-block w-100" alt="">
+                <img src="{{ asset('img/EV-accessories.webp') }}" class="d-block w-100" alt="Banner" loading="lazy">
             </div>
             <div class="carousel-item">
-                <img src="{{ asset('img/30-KW-DC-Charger.jpg') }}" class="d-block w-100" alt="">
+                <img src="{{ asset('img/30-KW-DC-Charger.webp') }}" class="d-block w-100" alt="Banner" loading="lazy">
             </div>
             <div class="carousel-item">
-                <img src="{{ asset('img/EV-Charging-Gun.jpg') }}" class="d-block w-100" alt="">
+                <img src="{{ asset('img/EV-Charging-Gun.webp') }}" class="d-block w-100" alt="Banner" loading="lazy">
             </div>
         </div>
 
@@ -54,7 +61,7 @@
             <div class="row align-items-center">
 
                 <!-- LEFT CONTENT -->
-                <div class="col-lg-12 mb-4" data-aos="fade-up">
+                <div class="col-lg-12 mb-4">
                     <div class="product-intro text-center">
                         <span class="sub-title">Our Range</span>
                         <h2>Smart EV Charging Products</h2>
@@ -68,44 +75,44 @@
                 <!-- RIGHT PRODUCTS -->
                 <div class="product-grid" data-aos="fade-up">
 
-                    <a href="{{ url('portable-ev-chargers') }}">
+                    <a href="{{ url('portable-ev-car-chargers') }}">
                         <div class="product-card">
-                            <img src="{{ asset('img/product/portable-ev-charger.jpg') }}" alt="">
-                            <h4>Portable EV Charger</h4>
+                            <img src="{{ asset('img/product/portable-ev-charger.webp') }}" alt="Portable EV Car Charger" loading="lazy">
+                            <h4>Portable EV Car Charger</h4>
                         </div>
                     </a>
 
-                    <a href="{{ url('popular-ac-charger') }}">
+                    <a href="{{ url('popular-ev-car-charger') }}">
                         <div class="product-card">
-                            <img src="{{ asset('img/product/wall-mount-ev-charger.jpg') }}" alt="">
-                            <h4>Popular AC Charger</h4>
+                            <img src="{{ asset('img/product/wall-mount-ev-charger.webp') }}" alt="Popular EV Car Charger" loading="lazy">
+                            <h4>Popular EV Car Charger</h4>
                         </div>
                     </a>
 
                     <a href="{{ url('ac-chargers') }}">
                         <div class="product-card">
-                            <img src="{{ asset('img/product/ac-charger.jpg') }}" alt="">
+                            <img src="{{ asset('img/product/ac-charger.webp') }}" alt="AC Charger" loading="lazy">
                             <h4>AC Charger</h4>
                         </div>
                     </a>
 
                     <a href="{{ url('dc-chargers') }}">
                         <div class="product-card">
-                            <img src="{{ asset('img/product/dc-chargers.jpg') }}" alt="">
+                            <img src="{{ asset('img/product/dc-chargers.webp') }}" alt="DC Charger" loading="lazy">
                             <h4>DC Charger</h4>
                         </div>
                     </a>
 
                     <a href="{{ url('gun-holders') }}">
                         <div class="product-card">
-                            <img src="{{ asset('img/product/gun-holder.jpg') }}" alt="">
+                            <img src="{{ asset('img/product/gun-holder.webp') }}" alt="Gun Holder" loading="lazy">
                             <h4>Gun Holder</h4>
                         </div>
                     </a>
 
                     <a href="{{ url('accessories') }}">
                         <div class="product-card">
-                            <img src="{{ asset('img/product/accessories.jpg') }}" alt="">
+                            <img src="{{ asset('img/product/accessories.webp') }}" alt="Accessories" loading="lazy">
                             <h4>Accessories</h4>
                         </div>
                     </a>
@@ -115,7 +122,7 @@
         </div>
     </div>
 
-    <div class="new-arrival-wrapper section-entry" data-aos="fade-up">
+       <div class="new-arrival-wrapper section-entry" data-aos="fade-up">
         <div class="container">
             <div class="row">
                 <div class="col-lg-12 text-center">
@@ -126,26 +133,26 @@
                     @foreach($products as $product)
 
                     <a href="{{ route('product.show', $product->slug) }}" class="product-card-link">
-                        <div class="product-card">
+                        <div class="product-card position-relative">
 
-                            {{-- New Badge --}}
-                            @if($product->is_new)
-                            <div class="product-badge new">New</div>
+                            {{-- New Arrival Badge (Manual Admin Control) --}}
+                            @if($product->is_new_arrival)
+                            <div class="product-badge new">
+                                New Arrival
+                            </div>
                             @endif
 
-                            {{-- Latest Badge (based on date) --}}
-                            @if($product->created_at >= now()->subDays(7))
-                            <div class="product-badge latest">New</div>
-                            @endif
+                          
 
                             <div class="product-img">
-                                <img src="{{ asset('storage/products/'.$product->image) }}" alt="{{ $product->name }}">
+                                <img src="{{ asset('storage/products/'.$product->image) }}" alt="{{ $product->name }}" loading="lazy">
                             </div>
 
                             <div class="product-body">
                                 <h4 class="product-title">{{ $product->name }}</h4>
+
                                 <p class="product-desc">
-                                    {{ Str::limit(strip_tags($product->description), 80) }}
+                                    {{ \Illuminate\Support\Str::limit(strip_tags($product->description), 80) }}
                                 </p>
                             </div>
 
@@ -153,14 +160,14 @@
                     </a>
 
                     @endforeach
+
                 </div>
 
             </div>
         </div>
     </div>
-
     <section class="cta-section">
-        <h2>Power the Future with Smart EV Charging</h2>
+        <h2>Power the Future with Smart EV Charger</h2>
         <p class="text-white">Fast, reliable, and future-ready EV charging solutions for homes, businesses, and fleets.
         </p>
         <div class="cta-btns" data-aos="fade-up">
@@ -186,7 +193,7 @@
                         </div>
                         <h4>Advanced Technology</h4>
                         <p>
-                            We use cutting-edge EV and battery technology to deliver
+                            We use cutting-edge EV technology to deliver
                             high performance and long-lasting solutions.
                         </p>
                     </div>
@@ -252,7 +259,7 @@
                     </p>
 
                     <div class="testimonial-user">
-                        <img src="{{ asset('img/user.png') }}" alt="">
+                        <img src="{{ asset('img/user.png') }}" alt="Review" loading="lazy">
                         <div>
                             <h5>Rahul Mehta</h5>
                             <span>EV Dealer, Delhi</span>
@@ -267,7 +274,7 @@
                     </p>
 
                     <div class="testimonial-user">
-                        <img src="{{ asset('img/user.png') }}" alt="">
+                        <img src="{{ asset('img/user.png') }}" alt="Review" loading="lazy">
                         <div>
                             <h5>Ankit Sharma</h5>
                             <span>Fleet Owner, Jaipur</span>
@@ -281,7 +288,7 @@
                     </p>
 
                     <div class="testimonial-user">
-                        <img src="{{ asset('img/user.png') }}" alt="">
+                        <img src="{{ asset('img/user.png') }}" alt="Review" loading="lazy">
                         <div>
                             <h5>Priya Verma</h5>
                             <span>Business Partner, Pune</span>

@@ -23,6 +23,7 @@ class Product extends Model
         'quantity',
         'description',
         'status',
+        'is_new_arrival',
         'image',
         'images',
         'hsn_code'

@@ -6,7 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title> @yield('title')</title>
+    <meta name="description" content="@yield('description')">
+    <meta name="keywords" content="@yield('keywords')">
 
     <link rel="icon" type="image/x-icon" href="{{ asset('img/fevicon.png') }}">
 
@@ -26,8 +28,46 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@4.0/dist/fancybox.css">
 
+    <meta name="google-site-verification" content="dkzFYUJ7Unt1uwa-he0n-YLWf_AwuPhbDCiwS0JTVUs" />
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RL3KZ5EMEB"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+        dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+
+    gtag('config', 'G-RL3KZ5EMEB');
+    </script>
+
+    <link rel="canonical" href="https://ev-fast.com/" />
     <!-- Scripts -->
+    
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17877827185"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+    
+      gtag('config', 'AW-17877827185');
+    </script>
+    
+    <!-- Event snippet for Purchase 01 conversion page -->
+    <script>
+      gtag('event', 'conversion', {
+          'send_to': 'AW-17877827185/3gVWCIKbuP0bEPH858xC',
+          'transaction_id': ''
+      });
+    </script>
+    
+
+
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+    
+    
 </head>
 
 <body>

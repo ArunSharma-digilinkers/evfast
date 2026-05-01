@@ -62,6 +62,15 @@
             </li>
 
 
+            <li class="nav-item">
+                <a href="{{ route('admin.career.index') }}"
+                    class="nav-link {{ request()->routeIs('admin.career.*') ? 'active' : '' }}">
+                    <i class="fas fa-blog me-2"></i> Career
+                </a>
+            </li>
+
+
+
 
             <li class="nav-item mt-4">
                 <form action="{{ route('logout') }}" method="POST">

@@ -40,7 +40,7 @@ return [
     ],
 
     'evfast' => [
-        'admin_email' => env('ADMIN_EMAIL', 'admin@evfast.com'),
+        'admin_email' => env('ADMIN_EMAIL', 'evjunction02@gmail.com'),
     ],
 
 ];

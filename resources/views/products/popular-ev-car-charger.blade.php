@@ -1,4 +1,11 @@
 @extends('layouts.main')
+
+@section('title', 'Popular EV Car Charger | EVFAST Charging Range')
+
+@section('description', 'Discover EVFAST popular EV car chargers in 7.4kW, 11kW & 22kW models. Smart, safe, and reliable charging solutions.')
+
+@section('keywords', '')
+
 @section('content')
 
 <div class="main-wrapper">
@@ -8,7 +15,7 @@
             <div class="row">
                 <div class="col-lg-12 text-center">
                     <span class="sub-title">Future-Ready Charging Solutions</span>
-                    <h2>Popular AC Charger</h2>
+                    <h2>Popular EV Car Chargers</h2>
                 </div>
                 <div class="inner-product-grid">
                     @forelse($products as $product)
@@ -26,7 +33,7 @@
                             <div class="product-img">
                                 <img src="{{ $product->image
                         ? asset('storage/products/'.$product->image)
-                        : asset('img/no-image.png') }}" alt="{{ $product->name }}">
+                        : asset('img/no-image.png') }}" alt="{{ $product->name }}" loading="lazy">
                             </div>
 
                             <div class="product-body">

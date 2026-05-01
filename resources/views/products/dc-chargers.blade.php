@@ -1,4 +1,11 @@
 @extends('layouts.main')
+
+@section('title', 'Electric Vehicle Charger | EVFAST DC Fast Charger')
+
+@section('description', 'EVFAST electric vehicle charger DC fast charging solutions for commercial EV stations. Reliable, efficient 30kW charging systems.')
+
+@section('keywords', '')
+
 @section('content')
 
 <div class="main-wrapper">
@@ -28,7 +35,7 @@
                     <img src="{{ $product->image
                         ? asset('storage/products/'.$product->image)
                         : asset('img/no-image.png') }}"
-                         alt="{{ $product->name }}">
+                         alt="{{ $product->name }}" loading="lazy">
                 </div>
 
                 <div class="product-body">

@@ -1,4 +1,11 @@
 @extends('layouts.main')
+
+@section('title', 'Contact EVFAST for EV Car Charger Support India')
+
+@section('description', 'Contact EVFAST for EV car charger support. Call +91-8595264742 or email aces@ev-fast.com for sales, service and dealership help.')
+
+@section('keywords', '')
+
 @section('content')
 
 <div class="main-wrapper">
@@ -15,9 +22,25 @@
                     <p>Send us your requirement and our team will contact you shortly.</p>
                 </div>
                 <div class="col-lg-6 col-md-12 col-sm-12">
-
-                    <form class="contact-form" method="POST" action="">
-
+                    @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    @endif
+                       
+                    <form class="contact-form" method="POST" action="{{ route('contact.submit') }}">
+                        @csrf
+                        
+                         @if(session('success'))
+                        <div class="alert alert-success">
+                            {{ session('success') }}
+                        </div>
+                        @endif
+                    
                         <!-- Name -->
                         <div class="form-group">
                             <label>Full Name</label>
@@ -27,13 +50,13 @@
                         <!-- Email (Multiple) -->
                         <div class="form-group">
                             <label>Email Address</label>
-                            <input type="email" name="emails[]" placeholder="Enter email" required>
+                            <input type="email" name="email" placeholder="Enter email" required>
                         </div>
 
                         <!-- Mobile (Multiple) -->
                         <div class="form-group">
                             <label>Mobile Number</label>
-                            <input type="tel" name="mobiles" placeholder="Enter mobile number" required>
+                            <input type="tel" name="mobile" placeholder="Enter mobile number" required>
                         </div>
 
                         <!-- Requirement -->
@@ -41,12 +64,13 @@
                             <label>Requirement</label>
                             <select name="requirement" required>
                                 <option value="">-- Select Requirement --</option>
-                                <option>EV Charger</option>
-                                <option>Portable EV Charger</option>
-                                <option>Commercial Charging Setup</option>
-                                <option>Accessories</option>
-                                <option>Dealership / Distribution</option>
-                                <option>Service & Support</option>
+                                <option value="EV Charger">EV Charger</option>
+                                <option value="Portable EV Charger">Portable EV Charger</option>
+                                <option value="Commercial Charging Setup">Commercial Charging Setup</option>
+                                <option value="Accessories">Accessories</option>
+                                <option value="Dealership">Dealership</option>
+                                <option value="Distribution">Distribution</option>
+                                <option value="Service & Support">Service & Support</option>
                             </select>
                         </div>
 
@@ -55,6 +79,10 @@
                             <label>Message</label>
                             <textarea name="message" rows="4" placeholder="Write your message"></textarea>
                         </div>
+                         <div class="g-recaptcha" data-sitekey="6LeCALUsAAAAAO8U5-SaU-dDGcE78Tx-N4TVb0K9"></div>
+                            @error('captcha')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
 
                         <button type="submit" class="btn-submit">
                             Submit Enquiry
@@ -63,6 +91,7 @@
                     </form>
 
                 </div>
+
 
                 <div class="col-lg-6 col-md-12 col-sm-12 mt-3">
 
@@ -111,10 +140,7 @@
                             </li>
 
                             <li>
-                                <iframe
-                                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3499.767519307047!2d77.113276915084!3d28.696600182392572!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390d03e51f8e982b%3A0x291aaf478f83e026!2sVardhaman%20Premium%20Mall!5e0!3m2!1sen!2sin!4v1589608920465!5m2!1sen!2sin"
-                                    width="100%" height="300" frameborder="0" style="border:0;" allowfullscreen=""
-                                    aria-hidden="false" tabindex="0"></iframe>
+                              <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3499.77483532951!2d77.11314517457544!3d28.696381381179997!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390da9be2b3a13bf%3A0x2f7d385a0bb1c890!2sEVFAST%20Charging%20Solutions!5e0!3m2!1sen!2sin!4v1772077327043!5m2!1sen!2sin" width="100%" height="250" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                             </li>
                         </ul>
 

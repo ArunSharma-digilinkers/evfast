@@ -1,4 +1,11 @@
 @extends('layouts.main')
+
+@section('title', 'EV Charging Socket Accessories | EVFAST India')
+
+@section('description', 'Shop EVFAST EV charging socket accessories like cables, gun holders, industrial sockets and charger stands for safe EV charging use.')
+
+@section('keywords', '')
+
 @section('content')
 
 <div class="main-wrapper">
@@ -26,7 +33,7 @@
                             <div class="product-img">
                                 <img src="{{ $product->image
                         ? asset('storage/products/'.$product->image)
-                        : asset('img/no-image.png') }}" alt="{{ $product->name }}">
+                        : asset('img/no-image.png') }}" alt="{{ $product->name }}" loading="lazy">
                             </div>
 
                             <div class="product-body">

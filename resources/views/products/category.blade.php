@@ -28,7 +28,7 @@
                             <div class="product-img">
                                 <img src="{{ $product->image
                         ? asset('storage/products/'.$product->image)
-                        : asset('img/no-image.png') }}" alt="{{ $product->name }}">
+                        : asset('img/no-image.png') }}" alt="{{ $product->name }}" loading="lazy">
                             </div>
 
                             <div class="product-body">

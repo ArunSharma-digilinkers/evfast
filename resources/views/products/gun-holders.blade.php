@@ -1,4 +1,11 @@
 @extends('layouts.main')
+
+@section('title', 'EV Charging Socket & Gun Holder | EVFAST')
+
+@section('description', 'EVFAST offers EV charging socket gun holders for Type-2 and CCS2 connectors. Durable, safe and reliable accessories for EV stations.')
+
+@section('keywords', '')
+
 @section('content')
 
 <div class="main-wrapper">
@@ -28,7 +35,7 @@
                     <img src="{{ $product->image
                         ? asset('storage/products/'.$product->image)
                         : asset('img/no-image.png') }}"
-                         alt="{{ $product->name }}">
+                         alt="{{ $product->name }}" loading="lazy">
                 </div>
 
                 <div class="product-body">

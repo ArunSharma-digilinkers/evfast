@@ -4,12 +4,17 @@
     </div>
 </a>
 
+<a href="tel:+91-8595264742">
+    <div class="callus">
+        <i class="fa-solid fa-phone"></i>
+    </div>
+</a>
 <div class="top-footer-wrapper section-entry">
     <div class="container">
         <div class="row">
             <div class="col-xl-3 col-lg-3 col-sm-12 mb-2">
                 <div class="footer-wrap">
-                    <img src="{{ asset('img/footer-logo.png') }}" class="img-fluid logo-img">
+                    <img src="{{ asset('img/footer-logo.png') }}" class="img-fluid logo-img" alt="footer logo" loading="lazy">
                     <p class="mrt30">
                         Accelerate electric vehicle charging revolution by offering the best charging experience to its
                         customers through affordable technology.
@@ -34,11 +39,14 @@
             <div class="col-xl-3 col-lg-3 col-sm-12 mb-2">
                 <div class="footer-wrap">
                     <h5>Quicks Links</h5>
-                    <ul>
+                   <ul>
                         <li><a href="/">Home</a></li>
                         <li><a href="{{ url('about-us') }}">About Us</a></li>
-                        <li><a href="#">Blog</a></li>
+                        <li><a href="{{ url('blog') }}">Blog</a></li>
                         <li><a href="{{ url('contact-us') }}">Contact Us</a></li>
+                        <li><a href="{{ url('privacy-policy') }}">Privacy Policy</a></li>
+                        <li><a href="{{ url('terms') }}">Term & Condition</a></li>
+                        <li><a href="{{ url('refund-policy') }}">Refund Policy</a></li>
                     </ul>
                 </div>
             </div>
@@ -47,8 +55,8 @@
                 <div class="footer-wrap">
                     <h5>Products</h5>
                     <ul>
-                        <li><a href="{{ url('portable-ev-chargers') }}">Portable EV Charger</a></li>
-                        <li><a href="{{ url('popular-ac-charger') }}">Popular AC Charger</a></li>
+                        <li><a href="{{ url('portable-ev-car-chargers') }}">Portable EV Car Charger</a></li>
+                        <li><a href="{{ url('popular-ev-car-charger') }}">Popular Ev Car Charger</a></li>
                         <li><a href="{{ url('ac-chargers') }}">AC Charger</a></li>
                         <li><a href="{{ url('dc-chargers') }}">DC Charger</a></li>
                         <li><a href="{{ url('gun-holders') }}">Gun Holder</a></li>
@@ -86,11 +94,14 @@
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
 <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@4.0/dist/fancybox.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
 <script src="{{ asset('js/main.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
 </body>
 
