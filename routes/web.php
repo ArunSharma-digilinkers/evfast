@@ -103,6 +103,9 @@ Route::prefix('user')
     Route::post('/checkout/place', [CheckoutController::class, 'placeOrder'])
         ->name('checkout.place');
 
+    Route::post('/checkout/validate', [CheckoutController::class, 'validateCheckout'])
+        ->name('checkout.validate');
+
     Route::post('/checkout/apply-coupon', [CheckoutController::class, 'applyCoupon'])
         ->name('checkout.applyCoupon');
 

@@ -408,37 +408,89 @@ function recalcTotal(shipping) {
     document.getElementById('pay-amount').textContent = roundedTotal.toLocaleString('en-IN');
 }
 
+function clearFieldErrors() {
+    document.querySelectorAll('#checkout-form .field-error').forEach(el => el.remove());
+    document.querySelectorAll('#checkout-form .is-invalid').forEach(el => el.classList.remove('is-invalid'));
+}
+
+function showFieldErrors(errors) {
+    clearFieldErrors();
+    let form = document.getElementById('checkout-form');
+    let firstField = null;
+
+    Object.keys(errors).forEach(field => {
+        let input = form.querySelector('[name="' + field + '"]');
+        if (!input) return;
+
+        input.classList.add('is-invalid');
+        let msg = document.createElement('div');
+        msg.className = 'field-error text-danger small mt-1';
+        msg.textContent = errors[field][0];
+        input.parentNode.appendChild(msg);
+
+        if (!firstField) firstField = input;
+    });
+
+    if (firstField) {
+        firstField.scrollIntoView({behavior: 'smooth', block: 'center'});
+        firstField.focus({preventScroll: true});
+    }
+}
+
 function payWithRazorpay() {
     let form = document.getElementById('checkout-form');
-    let name = form.querySelector('[name="name"]').value;
-    let phone = form.querySelector('[name="phone"]').value;
-    let email = form.querySelector('[name="email"]').value;
-    let state = form.querySelector('[name="state"]').value;
-    let address = form.querySelector('[name="address"]').value;
-
-    if (!name || !phone || !email || !state || !address) {
-        alert('Please fill all billing details first.');
-        return;
-    }
-
-    let shipDifferent = document.getElementById('ship-to-different').checked;
-    if (shipDifferent) {
-        let sName = form.querySelector('[name="shipping_name"]').value;
-        let sPhone = form.querySelector('[name="shipping_phone"]').value;
-        let sState = form.querySelector('[name="shipping_state"]').value;
-        let sCity = form.querySelector('[name="shipping_city"]').value;
-        let sAddress = form.querySelector('[name="shipping_address"]').value;
-
-        if (!sName || !sPhone || !sState || !sCity || !sAddress) {
-            alert('Please fill all shipping address details.');
-            return;
-        }
-    }
+    let payBtn = document.getElementById('pay-btn');
 
     if (!shippingResolved) {
         alert('Please select a state to calculate shipping.');
         return;
     }
+
+    clearFieldErrors();
+    payBtn.disabled = true;
+    let originalLabel = payBtn.innerHTML;
+    payBtn.innerHTML = 'Validating...';
+
+    let formData = new FormData(form);
+
+    fetch("{{ route('checkout.validate') }}", {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: formData
+    })
+    .then(res => res.json().then(data => ({status: res.status, data})))
+    .then(({status, data}) => {
+        payBtn.disabled = false;
+        payBtn.innerHTML = originalLabel;
+
+        if (status === 422 || !data.ok) {
+            if (data.errors && Object.keys(data.errors).length) {
+                showFieldErrors(data.errors);
+            } else if (data.message) {
+                alert(data.message);
+            } else {
+                alert('Please correct the errors and try again.');
+            }
+            return;
+        }
+
+        openRazorpay(form);
+    })
+    .catch(() => {
+        payBtn.disabled = false;
+        payBtn.innerHTML = originalLabel;
+        alert('Could not validate. Please check your connection and try again.');
+    });
+}
+
+function openRazorpay(form) {
+    let name = form.querySelector('[name="name"]').value;
+    let phone = form.querySelector('[name="phone"]').value;
+    let email = form.querySelector('[name="email"]').value;
+    let state = form.querySelector('[name="state"]').value;
 
     let consolidatedGst = baseProductGst + currentShippingGst;
     let exactTotal = (baseSubtotal - baseDiscount) + consolidatedGst + currentShipping;

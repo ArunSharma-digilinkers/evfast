@@ -210,16 +210,9 @@ class CheckoutController extends Controller
         return response()->json(['success' => true]);
     }
 
-    public function placeOrder(Request $request)
+    private function checkoutRules(bool $requirePayment = true): array
     {
-        $cart = session()->get('cart', []);
-
-        if (empty($cart)) {
-            return redirect()->route('cart.index')
-                ->with('error', 'Your cart is empty.');
-        }
-
-        $request->validate([
+        $rules = [
             'name'    => 'required|string|min:3',
             'email'   => 'required|email',
             'phone'   => 'required|digits:10',
@@ -236,8 +229,49 @@ class CheckoutController extends Controller
             'shipping_city'    => 'required_if:ship_to_different,1|nullable|string',
             'shipping_address' => 'required_if:ship_to_different,1|nullable|min:10',
             'payment_method' => 'required|in:razorpay',
-            'razorpay_payment_id' => 'required|string',
-        ]);
+        ];
+
+        if ($requirePayment) {
+            $rules['razorpay_payment_id'] = 'required|string';
+        }
+
+        return $rules;
+    }
+
+    public function validateCheckout(Request $request)
+    {
+        $cart = session()->get('cart', []);
+
+        if (empty($cart)) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Your cart is empty.',
+                'errors' => [],
+            ], 422);
+        }
+
+        $validator = validator($request->all(), $this->checkoutRules(false));
+
+        if ($validator->fails()) {
+            return response()->json([
+                'ok' => false,
+                'errors' => $validator->errors()->toArray(),
+            ], 422);
+        }
+
+        return response()->json(['ok' => true]);
+    }
+
+    public function placeOrder(Request $request)
+    {
+        $cart = session()->get('cart', []);
+
+        if (empty($cart)) {
+            return redirect()->route('cart.index')
+                ->with('error', 'Your cart is empty.');
+        }
+
+        $request->validate($this->checkoutRules(true));
 
         $coupon = null;
         $couponCode = session('coupon_code');
@@ -384,8 +418,17 @@ class CheckoutController extends Controller
                 $user->update(['gstin' => $request->gstin]);
             }
 
-            // Save address for new users
-            if ($isNewUser) {
+            // Save billing address if not already in this user's address book
+            $billingExists = Address::where('user_id', $user->id)
+                ->where('address', $request->address)
+                ->where('pincode', $request->pincode)
+                ->exists();
+
+            if (!$billingExists) {
+                $hasDefault = Address::where('user_id', $user->id)
+                    ->where('is_default', true)
+                    ->exists();
+
                 Address::create([
                     'user_id' => $user->id,
                     'label' => 'Billing',
@@ -395,10 +438,17 @@ class CheckoutController extends Controller
                     'pincode' => $request->pincode,
                     'state' => $request->state,
                     'city' => $request->city,
-                    'is_default' => true,
+                    'is_default' => !$hasDefault,
                 ]);
+            }
 
-                if ($shipToDifferent) {
+            if ($shipToDifferent) {
+                $shippingExists = Address::where('user_id', $user->id)
+                    ->where('address', $request->shipping_address)
+                    ->where('pincode', $request->shipping_pincode)
+                    ->exists();
+
+                if (!$shippingExists) {
                     Address::create([
                         'user_id' => $user->id,
                         'label' => 'Shipping',
