@@ -422,22 +422,54 @@ class CheckoutController extends Controller
                 ->first()
                 ?->update(['recovered' => true, 'recovered_order_id' => $order->id]);
 
-            // Send emails (outside transaction so failures don't break checkout)
+            // Send emails outside the transaction so mail failures never break checkout.
+            // Each message is attempted independently so one failure cannot block another.
+            $order->loadMissing('items.product');
+
             try {
-                $order->load('items.product');
-
                 Mail::to($order->email)->send(new OrderConfirmation($order));
+            } catch (\Throwable $e) {
+                \Log::error('Customer order confirmation email failed.', [
+                    'order_id' => $order->id,
+                    'recipient' => $order->email,
+                    'exception' => $e,
+                ]);
+            }
 
-                Mail::to(config('services.evfast.admin_email'))->send(new NewOrderAdmin($order));
+            $adminEmail = config('services.evfast.admin_email');
 
-                if ($isNewUser) {
-                    $token = Password::createToken($user);
-                    $resetUrl = url(route('password.reset', ['token' => $token, 'email' => $user->email], false));
-                    Mail::to($user->email)->send(new WelcomeNewUser($user, $resetUrl));
+            if (filter_var($adminEmail, FILTER_VALIDATE_EMAIL)) {
+                try {
+                    Mail::to($adminEmail)->send(new NewOrderAdmin($order));
+                } catch (\Throwable $e) {
+                    \Log::error('Admin new order email failed.', [
+                        'order_id' => $order->id,
+                        'recipient' => $adminEmail,
+                        'exception' => $e,
+                    ]);
                 }
-            } catch (\Exception $e) {
-                // Log email failure but don't break checkout
-                \Log::error('Order email failed: ' . $e->getMessage());
+            } else {
+                \Log::warning('Admin new order email was not sent because ADMIN_EMAIL is invalid.', [
+                    'order_id' => $order->id,
+                ]);
+            }
+
+            if ($isNewUser) {
+                try {
+                    $token = Password::createToken($user);
+                    $resetUrl = route('password.reset', [
+                        'token' => $token,
+                        'email' => $user->email,
+                    ]);
+                    Mail::to($user->email)->send(new WelcomeNewUser($user, $resetUrl));
+                } catch (\Throwable $e) {
+                    \Log::error('New customer welcome email failed.', [
+                        'order_id' => $order->id,
+                        'user_id' => $user->id,
+                        'recipient' => $user->email,
+                        'exception' => $e,
+                    ]);
+                }
             }
 
             // Clear cart and coupon

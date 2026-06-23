@@ -22,7 +22,9 @@
         <div class="body">
             <p>Hi {{ $user->name }},</p>
 
-            <p>Thank you for your purchase! An account has been created for you on EVFast. With your account you can:</p>
+            <p>Thank you for your purchase. We created an EVFast account for you using the email address from your order.</p>
+
+            <p>With your account you can:</p>
 
             <ul>
                 <li>Track your orders</li>
@@ -34,13 +36,25 @@
                 <strong>Your account email:</strong> {{ $user->email }}
             </div>
 
-            <p>To get started, please set your password by clicking the button below:</p>
+            <p>To activate your account, create a password using the secure button below:</p>
 
             <div style="text-align: center;">
                 <a href="{{ $resetUrl }}" class="btn">Set Your Password</a>
             </div>
 
-            <p style="color: #666; font-size: 13px;">This link will expire in 60 minutes. If it expires, you can use the "Forgot Password" option on the login page.</p>
+            <p style="color: #666; font-size: 13px;">
+                This secure link expires in {{ $expiresInMinutes }} minutes and can be used once.
+                If it expires, request a new link using "Forgot Password" on the login page.
+            </p>
+
+            <p style="color: #666; font-size: 13px; word-break: break-all;">
+                If the button does not work, copy and paste this address into your browser:<br>
+                <a href="{{ $resetUrl }}" style="color: #0f9b0f;">{{ $resetUrl }}</a>
+            </p>
+
+            <p style="color: #666; font-size: 13px;">
+                If you did not place this order, you can safely ignore this email.
+            </p>
         </div>
 
         <div class="footer">

@@ -1,4 +1,8 @@
 <x-guest-layout>
+    <div class="mb-4 text-sm text-gray-600">
+        {{ __('Create a password for your EVFast account. Use the same email address shown in your welcome email.') }}
+    </div>
+
     <form method="POST" action="{{ route('password.store') }}">
         @csrf
 
@@ -32,7 +36,7 @@
 
         <div class="flex items-center justify-end mt-4">
             <x-primary-button>
-                {{ __('Reset Password') }}
+                {{ __('Create Password') }}
             </x-primary-button>
         </div>
     </form>

@@ -7,9 +7,11 @@
         body {
             font-family: DejaVu Sans, sans-serif;
             font-size: 12px;
+            color: #111;
         }
 
         .container {
+            box-sizing: border-box;
             width: 100%;
             border: 2px solid #000;
             padding: 10px;
@@ -37,6 +39,7 @@
         .center { text-align: center; }
         .right { text-align: right; }
         .bold { font-weight: bold; }
+        .nowrap { white-space: nowrap; }
 
         .title {
             text-align: center;
@@ -75,18 +78,18 @@
 
         <td width="50%">
             <b>Advance Ev Charging Solutions</b><br>
-            Regd.Add:- C-68, First Floor,<br>
+            Regd. Add.: C-68, First Floor,<br>
             Mangolpuri Industrial Area, Phase - I<br>
             Delhi - 110083<br>
             GSTIN/UIN: 07ABPFA6419B1ZK<br>
-            State Name : Delhi, Code : 07
+            State: Delhi, Code: 07
         </td>
 
         <td width="30%" class="right">
             <div class="title">TAX INVOICE</div>
             Invoice No: {{ $order->invoice_number ?? 'INV-'.$order->id }}<br>
             Order Id: #{{ $order->id }}<br>
-            Date: {{ date('d-m-Y', strtotime($order->created_at)) }}
+            Date: {{ $order->created_at->format('d-m-Y') }}
         </td>
     </tr>
 </table>
@@ -126,16 +129,19 @@
 <!-- GST LOGIC -->
 @php
 $companyStateCode = '07';
+$placeOfSupplyState = $order->shipping_state ?: $order->state;
 
-if (!empty($order->gstin)) {
+if (!empty($placeOfSupplyState)) {
+    $customerStateCode = strtolower(trim($placeOfSupplyState)) === 'delhi' ? '07' : 'other';
+} elseif (!empty($order->gstin)) {
     $customerStateCode = substr($order->gstin, 0, 2);
-} elseif (!empty($order->shipping_state)) {
-    $customerStateCode = strtolower(trim($order->shipping_state)) === 'delhi' ? '07' : 'other';
 } else {
     $customerStateCode = 'other';
 }
 
-if ($customerStateCode === $companyStateCode) {
+$isIntraState = $customerStateCode === $companyStateCode;
+
+if ($isIntraState) {
     $cgst = $order->gst_total / 2;
     $sgst = $order->gst_total / 2;
     $igst = 0;
@@ -144,6 +150,10 @@ if ($customerStateCode === $companyStateCode) {
     $sgst = 0;
     $igst = $order->gst_total;
 }
+
+$shippingGstRate = $order->shipping_amount > 0 && $order->shipping_gst > 0
+    ? ($order->shipping_gst / $order->shipping_amount) * 100
+    : 0;
 @endphp
 
 <!-- PRODUCT TABLE -->
@@ -152,25 +162,25 @@ if ($customerStateCode === $companyStateCode) {
         <th>Description</th>
         <th>HSN</th>
         <th>GST %</th>
-        <th>Rate (Basic)</th>
+        <th>Taxable Rate</th>
         <th>Qty</th>
-        <th>Total (Rs.)</th>
+        <th>Taxable Value</th>
     </tr>
 
     @foreach($order->items as $item)
     <tr class="center">
         <td style="text-align:left;">
-            <b>{{ $item->product->name }}</b>
+            <b>{{ $item->product?->name ?? 'Product' }}</b>
             @if(!empty($item->serial_number))
                 <br>Serial No: {{ $item->serial_number }}
             @endif
         </td>
 
-        <td>{{ $item->product->hsn_code }}</td>
-        <td>{{ $item->product->gst_percentage }}%</td>
-        <td>{{ number_format($item->price,2) }}</td>
+        <td>{{ $item->product?->hsn_code ?? '-' }}</td>
+        <td>{{ rtrim(rtrim(number_format($item->gst_percentage, 2), '0'), '.') }}%</td>
+        <td>{{ number_format($item->base_price, 2) }}</td>
         <td>{{ $item->quantity }}</td>
-        <td>{{ number_format($item->total_price,2) }}</td>
+        <td>{{ number_format(($item->base_price * $item->quantity) - $item->discount_amount, 2) }}</td>
     </tr>
     @endforeach
 
@@ -179,7 +189,7 @@ if ($customerStateCode === $companyStateCode) {
     <tr class="center">
         <td style="text-align:left;"><b>Shipping Charges</b></td>
         <td>9967</td>
-        <td>18%</td>
+        <td>{{ rtrim(rtrim(number_format($shippingGstRate, 2), '0'), '.') }}%</td>
         <td>{{ number_format($order->shipping_amount,2) }}</td>
         <td>1</td>
         <td>{{ number_format($order->shipping_amount,2) }}</td>
@@ -200,12 +210,19 @@ if ($customerStateCode === $companyStateCode) {
                     <td class="right">{{ number_format($order->subtotal,2) }}</td>
                 </tr>
 
+                @if($order->discount_amount > 0)
+                    <tr>
+                        <td>Discount</td>
+                        <td class="right">- {{ number_format($order->discount_amount, 2) }}</td>
+                    </tr>
+                @endif
+
                 <tr>
                     <td>Shipping</td>
                     <td class="right">{{ number_format($order->shipping_amount,2) }}</td>
                 </tr>
 
-                @if($cgst > 0)
+                @if($isIntraState)
                     <tr>
                         <td>CGST</td>
                         <td class="right">{{ number_format($cgst,2) }}</td>
@@ -223,7 +240,7 @@ if ($customerStateCode === $companyStateCode) {
 
                 <tr class="bold">
                     <td>Total</td>
-                    <td class="right">₹ {{ number_format($order->total_amount,2) }}</td>
+                    <td class="right nowrap">&#8377; {{ number_format($order->total_amount, 2) }}</td>
                 </tr>
             </table>
         </td>

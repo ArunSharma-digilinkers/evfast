@@ -20,7 +20,7 @@ class NewOrderAdmin extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'New Order #' . $this->order->id . ' - ₹' . number_format($this->order->total_amount),
+            subject: 'New Order Received #' . $this->order->id . ' - INR ' . number_format($this->order->total_amount, 2),
         );
     }
 

@@ -28,8 +28,8 @@
                                 <th width="60">#</th>
                                 <th>Product</th>
                                 <th>Category</th>
+                                <th>Selling Price</th>
                                 <th>MRP</th>
-                                <th>Sales Price</th>
                                 <th>Qty</th>
                                 <th>Status</th>
                                 <th>Image</th>
@@ -53,10 +53,10 @@
                                     </td>
 
                                     <td class="fw-semibold">
-                                        ₹{{ number_format($product->price) }}
+                                        &#8377;{{ number_format($product->price, 2) }}
                                     </td>
                                     <td class="fw-semibold">
-                                        ₹{{ number_format($product->sale_price) }}
+                                        &#8377;{{ number_format($product->sale_price, 2) }}
                                     </td>
 
                                     <td>

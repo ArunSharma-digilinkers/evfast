@@ -67,15 +67,17 @@
 
                                 <div class="col-md-4">
                                     <label class="form-label">Product Image <span class="text-danger">*</span></label>
-                                    <input type="file" name="image" class="form-control mb-2" accept="image/*" required>
+                                    <input type="file" name="image" class="form-control mb-2"
+                                        accept=".jpg,.jpeg,.png,.webp" required>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label">Gallery Images</label>
-                                    <input type="file" name="images[]" class="form-control" accept="image/*" multiple>
+                                    <input type="file" name="images[]" class="form-control"
+                                        accept=".jpg,.jpeg,.png,.webp" multiple>
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Quantity <span class="text-danger">*</span></label>
-                                    <input type="number" name="quantity" class="form-control"
+                                    <input type="number" name="quantity" class="form-control" min="0" step="1"
                                         placeholder="Enter quantity" value="{{ old('quantity') }}" required>
                                 </div>
 
@@ -84,25 +86,26 @@
                             <!-- Price -->
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Price (₹) <span class="text-danger">*</span></label>
-                                    <input type="number" name="price" class="form-control"
-                                        placeholder="Enter sale price" value="{{ old('price') }}" required>
+                                    <label class="form-label">Selling Price (&#8377;) <span class="text-danger">*</span></label>
+                                    <input type="number" name="price" class="form-control" min="0" step="0.01"
+                                        placeholder="Enter selling price" value="{{ old('price') }}" required>
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">MRP (₹) <span class="text-danger">*</span></label>
-                                    <input type="number" name="sale_price" class="form-control" placeholder="Enter MRP"
+                                    <label class="form-label">MRP (&#8377;) <span class="text-danger">*</span></label>
+                                    <input type="number" name="sale_price" class="form-control" min="0" step="0.01"
+                                        placeholder="Enter MRP"
                                         value="{{ old('sale_price') }}" required>
                                 </div>
 
                                 <div class="col-md-3 mb-3">
                                     <label class="form-label">HSN Code</label>
-                                    <input type="number" name="hsn_code" class="form-control"
+                                    <input type="text" name="hsn_code" class="form-control" maxlength="20"
                                         value="{{ old('hsn_code') }}" placeholder="HSN Code">
                                 </div>
 
                                 <div class="col-md-3 mb-3">
                                     <label class="form-label">GST Percentage (%)</label>
-                                    <input type="number" name="gst_percentage" class="form-control" step="0.01" min="0"
+                                    <input type="number" name="gst_percentage" class="form-control" step="0.01" min="0" max="100"
                                         value="{{ old('gst_percentage', 0) }}" placeholder="e.g. 18">
                                 </div>
                                 <div class="col-md-3 mb-3">
@@ -142,8 +145,9 @@
 
                                     <select name="addons[]" class="form-select" multiple>
                                         @foreach ($products as $addon)
-                                        <option value="{{ $addon->id }}">
-                                            {{ $addon->name }} (₹{{ $addon->price }})
+                                        <option value="{{ $addon->id }}"
+                                            {{ in_array($addon->id, old('addons', [])) ? 'selected' : '' }}>
+                                            {{ $addon->name }} (&#8377;{{ number_format($addon->price, 2) }})
                                         </option>
                                         @endforeach
                                     </select>
@@ -158,22 +162,22 @@
                             <!-- Descriptions -->
                             <div class="mb-3">
                                 <label class="form-label">Short Description</label>
-                                <textarea name="short_description" class="form-control ckeditor" rows="3"></textarea>
+                                <textarea name="short_description" class="form-control ckeditor" rows="3">{{ old('short_description') }}</textarea>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">Long Description</label>
-                                <textarea name="description" class="form-control ckeditor" rows="4"></textarea>
+                                <textarea name="description" class="form-control ckeditor" rows="4">{{ old('description') }}</textarea>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">Technical Features</label>
-                                <textarea name="technical_features" class="form-control ckeditor" rows="4"></textarea>
+                                <textarea name="technical_features" class="form-control ckeditor" rows="4">{{ old('technical_features') }}</textarea>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">Product Warranty</label>
-                                <textarea name="warranty" class="form-control ckeditor" rows="3"></textarea>
+                                <textarea name="warranty" class="form-control ckeditor" rows="3">{{ old('warranty') }}</textarea>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">YouTube Video URL</label>
@@ -189,8 +193,8 @@
                             <div class="mb-4">
                                 <label class="form-label">Status</label>
                                 <select name="status" class="form-select">
-                                    <option value="1" selected>Active</option>
-                                    <option value="0">Inactive</option>
+                                    <option value="1" {{ old('status', '1') === '1' ? 'selected' : '' }}>Active</option>
+                                    <option value="0" {{ old('status') === '0' ? 'selected' : '' }}>Inactive</option>
                                 </select>
                             </div>
 

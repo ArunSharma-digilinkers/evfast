@@ -48,7 +48,7 @@
                                         <select name="category_id" class="form-select" required>
                                             @foreach ($categories as $cat)
                                             <option value="{{ $cat->id }}"
-                                                {{ $product->category_id == $cat->id ? 'selected' : '' }}>
+                                                {{ old('category_id', $product->category_id) == $cat->id ? 'selected' : '' }}>
                                                 {{ $cat->name }}
                                             </option>
                                             @endforeach
@@ -70,9 +70,8 @@
                                     <!-- Product Name -->
                                     <div class="mb-3">
                                         <label class="form-label">HSN Code <span class="text-danger"></span></label>
-                                        <input type="number" name="hsn_code"
-                                            value="{{ old('hsn_code', $product->hsn_code) }}" class="form-control"
-                                            required>
+                                        <input type="text" name="hsn_code" maxlength="20"
+                                            value="{{ old('hsn_code', $product->hsn_code) }}" class="form-control">
                                     </div>
 
                                 </div>
@@ -81,27 +80,29 @@
                             <!-- Price & Quantity -->
                             <div class="row">
                                 <div class="col-md-4 mb-3">
-                                    <label class="form-label">Price (₹) <span class="text-danger">*</span></label>
+                                    <label class="form-label">Selling Price (&#8377;) <span class="text-danger">*</span></label>
                                     <input type="number" name="price" value="{{ old('price', $product->price) }}"
-                                        class="form-control" required>
+                                        class="form-control" min="0" step="0.01" required>
                                 </div>
 
                                 <div class="col-md-4 mb-3">
-                                    <label class="form-label">MRP (₹) <span class="text-danger">*</span></label>
+                                    <label class="form-label">MRP (&#8377;) <span class="text-danger">*</span></label>
                                     <input type="number" name="sale_price"
                                         value="{{ old('sale_price', $product->sale_price) }}" class="form-control"
+                                        min="0" step="0.01"
                                         required>
                                 </div>
 
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Quantity <span class="text-danger">*</span></label>
                                     <input type="number" name="quantity"
-                                        value="{{ old('quantity', $product->quantity) }}" class="form-control" required>
+                                        value="{{ old('quantity', $product->quantity) }}" class="form-control"
+                                        min="0" step="1" required>
                                 </div>
 
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">GST Percentage (%)</label>
-                                    <input type="number" name="gst_percentage" class="form-control" step="0.01" min="0"
+                                    <input type="number" name="gst_percentage" class="form-control" step="0.01" min="0" max="100"
                                         value="{{ old('gst_percentage', $product->gst_percentage) }}"
                                         placeholder="e.g. 18">
                                 </div>
@@ -146,8 +147,8 @@
                                 <select name="addons[]" class="form-select" multiple>
                                     @foreach ($products as $p)
                                     <option value="{{ $p->id }}"
-                                        {{ $product->addons->contains($p->id) ? 'selected' : '' }}>
-                                        {{ $p->name }} (₹{{ $p->price }})
+                                        {{ in_array($p->id, old('addons', $product->addons->modelKeys())) ? 'selected' : '' }}>
+                                        {{ $p->name }} (&#8377;{{ number_format($p->price, 2) }})
                                     </option>
                                     @endforeach
                                 </select>
@@ -187,7 +188,8 @@
                             <!-- Main Image -->
                             <div class="mb-4">
                                 <label class="form-label">Main Image</label>
-                                <input type="file" name="image" class="form-control mb-2">
+                                <input type="file" name="image" class="form-control mb-2"
+                                    accept=".jpg,.jpeg,.png,.webp">
 
                                 @if ($product->image)
                                 <img src="{{ asset('storage/products/' . $product->image) }}" class="img-thumbnail"
@@ -198,7 +200,8 @@
                             <!-- Gallery Images -->
                             <div class="mb-4">
                                 <label class="form-label">Gallery Images</label>
-                                <input type="file" name="images[]" class="form-control mb-3" multiple>
+                                <input type="file" name="images[]" class="form-control mb-3"
+                                    accept=".jpg,.jpeg,.png,.webp" multiple>
 
 
                                 @if ($product->images)
@@ -243,8 +246,8 @@
                             <div class="mb-4">
                                 <label class="form-label">Status</label>
                                 <select name="status" class="form-select">
-                                    <option value="1" {{ $product->status ? 'selected' : '' }}>Active</option>
-                                    <option value="0" {{ !$product->status ? 'selected' : '' }}>Inactive</option>
+                                    <option value="1" {{ old('status', (string) $product->status) === '1' ? 'selected' : '' }}>Active</option>
+                                    <option value="0" {{ old('status', (string) $product->status) === '0' ? 'selected' : '' }}>Inactive</option>
                                 </select>
                             </div>
                             <!-- Product Labels -->

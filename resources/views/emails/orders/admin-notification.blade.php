@@ -59,7 +59,10 @@
                 @if($order->has_separate_shipping)
                 <div class="info-row">
                     <span class="info-label">Shipping To:</span>
-                    <span>{{ $order->shipping_name }} — {{ $order->shipping_address }}, {{ $order->shipping_city }}, {{ $order->shipping_state }} - {{ $order->shipping_pincode }}</span>
+                    <span>
+                        {{ $order->shipping_name }} ({{ $order->shipping_phone }})<br>
+                        {{ $order->shipping_address }}, {{ $order->shipping_city }}, {{ $order->shipping_state }} - {{ $order->shipping_pincode }}
+                    </span>
                 </div>
                 @endif
                 <div class="info-row">
@@ -82,7 +85,7 @@
                     <tr>
                         <td>{{ $item->product->name ?? 'Product' }}</td>
                         <td style="text-align:center">{{ $item->quantity }}</td>
-                        <td style="text-align:right">{{ number_format($item->total_price, 2) }}</td>
+                        <td style="text-align:right">&#8377;{{ number_format($item->total_price, 2) }}</td>
                     </tr>
                     @endforeach
                 </tbody>

@@ -28,7 +28,7 @@
 
             <p>Hi <strong>{{ $order->name }}</strong>,</p>
 
-            <p>We’re happy to let you know that your order has been successfully placed.</p>
+            <p>We're happy to let you know that your order has been successfully placed and payment has been received.</p>
 
             <div class="highlight-box">
                 <div>Order #{{ $order->id }}</div>
@@ -50,7 +50,7 @@
                     <tr>
                         <td>{{ $item->product->name ?? 'Product' }}</td>
                         <td style="text-align:center">{{ $item->quantity }}</td>
-                        <td style="text-align:right">{{ number_format($item->total_price, 2) }}</td>
+                        <td style="text-align:right">&#8377;{{ number_format($item->total_price, 2) }}</td>
                     </tr>
                     @endforeach
                 </tbody>
@@ -81,7 +81,7 @@
             </p>
 
             <div style="text-align: center;">
-                <a href="{{ route('orders.show', $order->id) }}" class="btn">
+                <a href="{{ route('user.orders.show', $order->id) }}" class="btn">
                     View Your Order
                 </a>
             </div>
@@ -95,7 +95,7 @@
         </div>
 
         <div class="footer">
-            <p>Thank you for shopping with EVFast ❤️</p>
+            <p>Thank you for shopping with EVFast.</p>
         </div>
 
     </div>

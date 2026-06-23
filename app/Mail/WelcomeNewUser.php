@@ -13,8 +13,14 @@ class WelcomeNewUser extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public function __construct(public User $user, public string $resetUrl)
-    {
+    public int $expiresInMinutes;
+
+    public function __construct(
+        public User $user,
+        public string $resetUrl,
+    ) {
+        $broker = config('auth.defaults.passwords', 'users');
+        $this->expiresInMinutes = (int) config("auth.passwords.{$broker}.expire", 60);
     }
 
     public function envelope(): Envelope
